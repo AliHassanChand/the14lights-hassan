@@ -1,0 +1,101 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Serve custom 404 page with real HTTP 404 status
+  ErrorDocument 404 /404.html
+
+  # 1. Enforce HTTPS & Non-WWW Canonical Domain in a Single Hop
+  RewriteCond %{HTTP_HOST} ^www\.the14lights\.com$ [NC,OR]
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://the14lights.com/$1 [R=301,L]
+
+  # 2. Direct 301 Redirect for index.html to root
+  RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /index\.html\ HTTP/ [NC]
+  RewriteRule ^index\.html$ https://the14lights.com/ [R=301,L]
+
+  # 3. SPA Fallback routing for React client-side navigation (Hostinger compatible)
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# MIME Types Configuration
+<IfModule mod_mime.c>
+  AddType text/html .html .htm
+  AddType text/css .css
+  AddType application/javascript .js .mjs
+  AddType application/json .json .map
+  AddType image/webp .webp
+  AddType image/png .png
+  AddType image/jpeg .jpg .jpeg
+  AddType image/svg+xml .svg .svgz
+  AddType image/x-icon .ico
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType font/ttf .ttf
+  AddType application/wasm .wasm
+  AddType application/octet-stream .data
+  AddType application/xml .xml
+</IfModule>
+
+# Compression Configuration for Apache / LiteSpeed (Hostinger)
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css application/javascript application/json image/svg+xml application/wasm
+</IfModule>
+
+# Security, HSTS & Cache-Control Header Configuration for Apache / LiteSpeed (Hostinger)
+<IfModule mod_headers.c>
+  # Global HSTS & Security Headers
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # 1. Critical Entry Points & Service Worker: NEVER CACHE (Always revalidate with server)
+  <FilesMatch "\.(html|htm|json|xml)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  <FilesMatch "^(sw|service-worker)\.js$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # 2. Immutable Hashed Static Assets (Vite outputs in /assets/ or hashed filenames)
+  <FilesMatch "\.([a-f0-9]{8,64})\.(js|css|webp|png|jpg|jpeg|gif|svg|woff2?|ttf|otf)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # 3. Static Media Assets (unhashed webp, png, jpg, ico, svg, fonts)
+  <FilesMatch "\.(webp|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|otf)$">
+    Header set Cache-Control "public, max-age=86400, stale-while-revalidate=604800"
+  </FilesMatch>
+</IfModule>
+
+# Enable ETags for effective validation
+FileETag MTime Size
+
+# Expires Headers Fallback
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 day"
+
+  # HTML & Service Worker (No cache)
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/json "access plus 0 seconds"
+  ExpiresByType application/javascript "access plus 1 year"
+
+  # Media & Fonts
+  ExpiresByType image/webp "access plus 1 day"
+  ExpiresByType image/png "access plus 1 day"
+  ExpiresByType image/jpeg "access plus 1 day"
+  ExpiresByType image/x-icon "access plus 1 day"
+  ExpiresByType image/svg+xml "access plus 1 day"
+  ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+

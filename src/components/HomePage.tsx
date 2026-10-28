@@ -1,0 +1,1161 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { PageView } from '../types';
+import vrLogo from '../assets/VR_LOGO.webp';
+import hassanProfileImg from '../assets/profile.png';
+import { getCacheBustedUrl } from '../utils/cacheManager';
+import { GamePlayerModal } from './GamePlayerModal';
+import { getEduraXRLink, isProductionThe14Lights } from '../utils/domain';
+
+interface HomePageProps {
+  onNavigate: (page: PageView, articleId?: string) => void;
+}
+
+export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'all' | 'action' | 'sports' | 'rpg' | 'coming_soon'>('all');
+  const [activeGameModal, setActiveGameModal] = useState<{ isOpen: boolean; title: string; url: string }>({
+    isOpen: false,
+    title: '',
+    url: '',
+  });
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const brandsSliderRef = useRef<HTMLDivElement | null>(null);
+  const gamesGridRef = useRef<HTMLDivElement | null>(null);
+  const progressSectionRef = useRef<HTMLDivElement | null>(null);
+  const [clientProgress, setClientProgress] = useState(0);
+
+  // Set theme class on body
+  useEffect(() => {
+    document.body.className = 'antialiased selection:bg-gold-500 selection:text-black w-full overflow-x-hidden home-page';
+    return () => {
+      document.body.className = '';
+    };
+  }, []);
+
+  // Canvas Starfield Animation
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId: number;
+    let isVisible = true;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const isMobile = window.innerWidth < 768;
+    const starCount = isMobile ? 45 : 250;
+    const speed = isMobile ? 1.2 : 1.8;
+    const colors = ['#D4AF37', '#3B82F6', '#ffffff', '#8e6f1f'];
+
+    interface Star {
+      x: number;
+      y: number;
+      z: number;
+      o: number;
+      c: string;
+    }
+
+    let stars: Star[] = [];
+
+    const initStars = () => {
+      stars = [];
+      for (let i = 0; i < starCount; i++) {
+        stars.push({
+          x: Math.random() * width - width / 2,
+          y: Math.random() * height - height / 2,
+          z: Math.random() * width,
+          o: Math.random(),
+          c: colors[Math.floor(Math.random() * colors.length)],
+        });
+      }
+    };
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      initStars();
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    initStars();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries[0].isIntersecting;
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(canvas);
+
+    let lastFrameTime = performance.now();
+    const animate = (now: number) => {
+      if (isVisible) {
+        // Throttle mobile frames to ~30fps to save battery & CPU
+        if (!isMobile || now - lastFrameTime >= 30) {
+          lastFrameTime = now;
+          ctx.fillStyle = 'rgba(5, 5, 7, 0.4)';
+          ctx.fillRect(0, 0, width, height);
+
+          const cx = width / 2;
+          const cy = height / 2;
+
+          for (let i = 0; i < stars.length; i++) {
+            const star = stars[i];
+            star.z -= speed;
+
+            if (star.z <= 0) {
+              star.z = width;
+              star.x = Math.random() * width - width / 2;
+              star.y = Math.random() * height - height / 2;
+            }
+
+            const k = 128.0 / star.z;
+            const px = star.x * k + cx;
+            const py = star.y * k + cy;
+
+            const size = (1 - star.z / width) * 3;
+            const opacity = 1 - star.z / width;
+
+            if (px >= 0 && px <= width && py >= 0 && py <= height) {
+              ctx.beginPath();
+              ctx.fillStyle = star.c;
+              ctx.globalAlpha = opacity;
+              ctx.arc(px, py, Math.max(0, size), 0, Math.PI * 2);
+              ctx.fill();
+
+              if (!isMobile && size > 1.5) {
+                ctx.beginPath();
+                ctx.strokeStyle = star.c;
+                ctx.lineWidth = size * 0.5;
+                ctx.moveTo(px, py);
+                ctx.lineTo(px + (px - cx) * 0.05, py + (py - cy) * 0.05);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+      }
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      observer.disconnect();
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  // Brands Slider Auto Scroll for mobile
+  useEffect(() => {
+    const slider = brandsSliderRef.current;
+    if (!slider) return;
+
+    let autoScroll = true;
+    let isVisible = false;
+    let isMobileView = window.innerWidth < 1024;
+    let animationId: number;
+    let resumeTimeout: NodeJS.Timeout;
+    const scrollSpeed = 0.8;
+    let currentScroll = 0;
+    let maxScroll = 1000;
+
+    const updateDimensions = () => {
+      if (slider) {
+        requestAnimationFrame(() => {
+          maxScroll = slider.scrollWidth / 2 || 1000;
+          currentScroll = slider.scrollLeft;
+        });
+      }
+      isMobileView = window.innerWidth < 1024;
+    };
+
+    const handleResize = () => {
+      isMobileView = window.innerWidth < 1024;
+      if (isMobileView) updateDimensions();
+    };
+
+    window.addEventListener('resize', handleResize, { passive: true });
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        isVisible = entries[0].isIntersecting;
+        if (isVisible) updateDimensions();
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(slider);
+
+    const animate = () => {
+      if (isMobileView && autoScroll && isVisible && slider) {
+        currentScroll += scrollSpeed;
+        if (currentScroll >= maxScroll) {
+          currentScroll = 0;
+        }
+        slider.scrollLeft = currentScroll;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+
+    animationId = requestAnimationFrame(animate);
+
+    const pauseAutoScroll = () => {
+      autoScroll = false;
+      clearTimeout(resumeTimeout);
+      resumeTimeout = setTimeout(() => {
+        if (slider) updateDimensions();
+        autoScroll = true;
+      }, 2000);
+    };
+
+    slider.addEventListener('touchstart', pauseAutoScroll, { passive: true });
+    slider.addEventListener('touchmove', pauseAutoScroll, { passive: true });
+    slider.addEventListener('wheel', pauseAutoScroll, { passive: true });
+    slider.addEventListener('mousedown', pauseAutoScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationId);
+      clearTimeout(resumeTimeout);
+      observer.disconnect();
+      if (slider) {
+        slider.removeEventListener('touchstart', pauseAutoScroll);
+        slider.removeEventListener('touchmove', pauseAutoScroll);
+        slider.removeEventListener('wheel', pauseAutoScroll);
+        slider.removeEventListener('mousedown', pauseAutoScroll);
+      }
+    };
+  }, []);
+
+  // Smooth 0 to 100% progress animation when scrolling into this section
+  useEffect(() => {
+    const el = progressSectionRef.current;
+    if (!el) return;
+
+    let animId: number | null = null;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry.isIntersecting) {
+          if (animId) cancelAnimationFrame(animId);
+          setClientProgress(0);
+
+          const duration = 5000; // 5 seconds total fill time
+          const startTime = performance.now();
+
+          const animate = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+
+            let currentVal = 0;
+            if (elapsed <= 0) {
+              currentVal = 0;
+            } else if (elapsed < 1200) {
+              // 0 to 30% (1.2s smooth ramp)
+              const p = elapsed / 1200;
+              const ease = 1 - Math.pow(1 - p, 2.2);
+              currentVal = Math.round(ease * 30);
+            } else if (elapsed < 1800) {
+              // Little break at 30% (1.2s - 1.8s)
+              currentVal = 30;
+            } else if (elapsed < 3300) {
+              // 30% to 80% surge (1.8s - 3.3s)
+              const p = (elapsed - 1800) / 1500;
+              const ease = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+              currentVal = Math.round(30 + ease * 50);
+            } else if (elapsed < 3900) {
+              // Brief pause at 80% (3.3s - 3.9s)
+              currentVal = 80;
+            } else if (elapsed < 5000) {
+              // 80% to 100% final smooth push (3.9s - 5.0s)
+              const p = (elapsed - 3900) / 1100;
+              const ease = 1 - Math.pow(1 - p, 2.5);
+              currentVal = Math.round(80 + ease * 20);
+            } else {
+              currentVal = 100;
+            }
+
+            setClientProgress(currentVal);
+
+            if (elapsed < duration) {
+              animId = requestAnimationFrame(animate);
+            } else {
+              setClientProgress(100);
+            }
+          };
+
+          animId = requestAnimationFrame(animate);
+        } else {
+          if (animId) cancelAnimationFrame(animId);
+          setClientProgress(0);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (animId) cancelAnimationFrame(animId);
+    };
+  }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href === 'blog') {
+      e.preventDefault();
+      onNavigate('blog');
+      setMobileMenuOpen(false);
+    } else if (href.startsWith('#')) {
+      e.preventDefault();
+      setMobileMenuOpen(false);
+      const elem = document.querySelector(href);
+      if (elem) {
+        elem.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#050507] text-[#e6eef8]">
+      {/* A11y Skip link */}
+      <a href="#main-content" className="skip-link">Skip to main content</a>
+
+      {/* Navigation */}
+      <nav className="sticky top-0 z-40 nav-glass transition-all duration-300 w-full" id="navbar" aria-label="Main Navigation">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
+          <button onClick={() => onNavigate('home')} className="group flex items-center gap-3 text-left focus:outline-none" aria-label="The 14 Lights - Go to Homepage">
+            <div className="relative w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full overflow-hidden transition p-1 bg-white ring-2 ring-gold-400/50 shadow-md">
+              <picture className="w-full h-full flex items-center justify-center">
+                <source srcSet="/assets/VR_LOGO.webp" type="image/webp" />
+                <img
+                  src={vrLogo}
+                  alt="The 14 Lights Logo"
+                  width={48}
+                  height={48}
+                  decoding="async"
+                  fetchPriority="high"
+                  className="w-full h-full object-contain transform group-hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    const fallbacks = ['/assets/VR_LOGO.webp', '/VR_LOGO.webp', '/assets/VR_LOGO.png', '/favicon.png'];
+                    const step = parseInt(target.dataset.fallbackStep || '0', 10);
+                    if (step < fallbacks.length) {
+                      target.dataset.fallbackStep = String(step + 1);
+                      target.src = fallbacks[step];
+                    } else {
+                      target.onerror = null;
+                    }
+                  }}
+                />
+              </picture>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg md:text-xl font-display font-bold text-white tracking-wider leading-none group-hover:text-gold-400 transition">
+                The<span className="text-gold-500"> 14 Lights</span>
+              </span>
+            </div>
+          </button>
+
+          {/* Desktop Menu */}
+          <ul className="hidden lg:flex items-center justify-end gap-1 ml-auto p-1.5 rounded-full bg-white/[0.03] border border-white/10 backdrop-blur-xl shadow-[inset_0_1px_1px_rgba(255,255,255,0.06),0_8px_20px_rgba(0,0,0,0.35)]">
+            <li>
+              <button onClick={() => onNavigate('home')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200">
+                Home
+              </button>
+            </li>
+            <li>
+              <a href="#about" onClick={(e) => handleNavClick(e, '#about')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200">
+                About
+              </a>
+            </li>
+            <li>
+              <a href="#top-games" onClick={(e) => handleNavClick(e, '#top-games')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200">
+                Portfolio
+              </a>
+            </li>
+            <li>
+              <a href="#team" onClick={(e) => handleNavClick(e, '#team')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200">
+                Creators
+              </a>
+            </li>
+            <li>
+              <a href="#clients" onClick={(e) => handleNavClick(e, '#clients')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200">
+                Clients
+              </a>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('blog')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-white hover:bg-white/10 active:scale-95 transition-all duration-200">
+                Blog
+              </button>
+            </li>
+            <li>
+              <button onClick={() => onNavigate('newsletter')} className="px-3.5 py-1.5 rounded-full text-xs font-medium text-gray-300 hover:text-gold-400 hover:bg-gold-500/10 active:scale-95 transition-all duration-200">
+                Newsletter
+              </button>
+            </li>
+            {/* EduraXR Button in Right Last of Nav */}
+            <li className="ml-1 pl-2 border-l border-white/10 flex items-center">
+              <a
+                href={getEduraXRLink('/')}
+                onClick={(e) => {
+                  if (!isProductionThe14Lights()) {
+                    e.preventDefault();
+                    onNavigate('eduraxr');
+                  }
+                }}
+                className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-full font-display font-bold text-xs uppercase tracking-wider text-black bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 border border-gold-200/80 shadow-[0_0_20px_rgba(212,175,55,0.45)] hover:shadow-[0_0_30px_rgba(212,175,55,0.8)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer select-none overflow-hidden"
+                aria-label="EduraXR - Connected with subdomain eduraxr.the14lights.com"
+                title="EduraXR - eduraxr.the14lights.com"
+              >
+                {/* Dynamic light sheen highlight sweep */}
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/50 to-transparent pointer-events-none"></div>
+
+                {/* Live Pulsing Beacon */}
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-black"></span>
+                </span>
+
+                <span className="tracking-wide">
+                  edura<span className="font-black text-black">XR</span>
+                </span>
+
+                <i className="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-75 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" aria-hidden="true"></i>
+              </a>
+            </li>
+          </ul>
+
+          {/* Mobile Toggle */}
+          <div className="flex items-center">
+            <button
+              id="hambtn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-2xl text-gray-300 hover:text-gold-500 transition focus:outline-none p-2 lg:hidden"
+              aria-label="Open Mobile Menu"
+              aria-expanded={mobileMenuOpen}
+            >
+              <i className={`fa-solid ${mobileMenuOpen ? 'fa-xmark' : 'fa-bars-staggered'}`} aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="lg:hidden bg-dark-950/95 backdrop-blur-xl border-t border-white/10 absolute w-full left-0 z-50">
+            <div className="px-6 py-6 flex flex-col gap-3">
+              <button onClick={() => { onNavigate('home'); setMobileMenuOpen(false); }} className="text-left text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                Home
+              </button>
+              <a href="#about" onClick={(e) => { handleNavClick(e, '#about'); setMobileMenuOpen(false); }} className="text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                About
+              </a>
+              <a href="#top-games" onClick={(e) => { handleNavClick(e, '#top-games'); setMobileMenuOpen(false); }} className="text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                Portfolio
+              </a>
+              <a href="#team" onClick={(e) => { handleNavClick(e, '#team'); setMobileMenuOpen(false); }} className="text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                Creators
+              </a>
+              <a href="#clients" onClick={(e) => { handleNavClick(e, '#clients'); setMobileMenuOpen(false); }} className="text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                100+ Happy Clients
+              </a>
+              <button onClick={() => { onNavigate('blog'); setMobileMenuOpen(false); }} className="text-left text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                Blog
+              </button>
+              <button onClick={() => { onNavigate('newsletter'); setMobileMenuOpen(false); }} className="text-left text-gray-300 hover:text-gold-400 font-medium py-2 border-b border-white/5">
+                Newsletter
+              </button>
+              <a href="#about" onClick={(e) => { handleNavClick(e, '#about'); setMobileMenuOpen(false); }} className="mt-2 text-center py-2.5 rounded-full font-bold bg-gold-500 text-black">
+                Get Started
+              </a>
+              {/* EduraXR Subdomain Button in Mobile Menu */}
+              <div className="pt-3 mt-1 border-t border-white/10 flex flex-col gap-2">
+                <a
+                  href={getEduraXRLink('/')}
+                  onClick={(e) => {
+                    setMobileMenuOpen(false);
+                    if (!isProductionThe14Lights()) {
+                      e.preventDefault();
+                      onNavigate('eduraxr');
+                    }
+                  }}
+                  className="w-full flex items-center justify-between px-4 py-3 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-black bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500 shadow-[0_0_20px_rgba(212,175,55,0.35)] active:scale-95 transition-transform"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-black"></span>
+                    </span>
+                    <span className="text-sm tracking-wider font-extrabold">eduraXR</span>
+                    <span className="text-[10px] text-neutral-900 font-sans normal-case tracking-tight font-medium">(Virtual AI Teacher)</span>
+                  </div>
+                  <span className="text-xs">
+                    <i className="fa-solid fa-arrow-up-right-from-square"></i>
+                  </span>
+                </a>
+                <span className="text-[10px] text-gold-400/80 font-mono text-center">
+                  Subdomain: eduraxr.the14lights.com
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* Hero Header */}
+      <header className="relative min-h-[80dvh] w-full flex flex-col items-center justify-center overflow-hidden bg-black pt-0 md:pt-0">
+        <canvas ref={canvasRef} id="innovation-canvas" className="absolute inset-0 w-full h-full z-0 opacity-80" aria-hidden="true"></canvas>
+
+        <div className="absolute inset-0 bg-gradient-to-b from-dark-950/90 via-transparent to-dark-950/90 z-10 pointer-events-none"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_10%,_#050507_90%)] z-10 pointer-events-none"></div>
+
+        <div className="relative z-20 w-full max-w-8xl mx-auto px-2 md:px-2 text-center flex flex-col items-center justify-center">
+          {/* Brand Treatment Above Main Heading */}
+          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full border border-gold-500/30 bg-gold-500/10 backdrop-blur-md mt-4 md:mt-6 mb-4 md:mb-6 fade-in-up shadow-sm shadow-gold-500/10" style={{ animationDelay: '0.1s' }}>
+            <span className="w-2.5 h-2.5 rounded-full bg-gold-400 animate-pulse"></span>
+            <span className="text-base sm:text-lg md:text-xl font-display font-bold tracking-wider text-white">
+              edura<span className="text-gradient-gold font-extrabold">XR</span>
+            </span>
+          </div>
+
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-black leading-tight mb-4 md:mb-6 fade-in-up" style={{ animationDelay: '0.2s' }}>
+            <span className="text-white tracking-wide">PAKISTAN’S FIRST</span><br />
+            <span className="text-gradient-gold drop-shadow-lg">VIRTUAL AI TEACHER</span>
+          </h1>
+
+          <p className="text-base md:text-xl text-gray-300 max-w-xl md:max-w-3xl mx-auto mb-8 md:mb-10 leading-relaxed font-light fade-in-up px-2" style={{ animationDelay: '0.3s' }}>
+            Discover Pakistan’s first Virtual AI Teacher, an adaptive EdTech platform delivering personalised, multilingual tutoring in Urdu and English, enhanced by immersive VR learning simulations.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5 w-full sm:w-auto fade-in-up" style={{ animationDelay: '0.4s' }}>
+            <button
+              onClick={() => onNavigate('article', 'ai-virtual-teacher-edtech-pakistan-guide')}
+              className="w-full sm:w-auto btn-gold px-8 py-4 rounded font-bold uppercase tracking-wide shadow-lg shadow-gold-500/20 text-sm transform hover:scale-105 transition duration-300 text-center flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <i className="fa-solid fa-book-open ml-1" aria-hidden="true"></i> Read More <i className="fa-solid fa-arrow-right ml-1" aria-hidden="true"></i>
+            </button>
+            <a href="mailto:hello@the14lights.com" className="w-full sm:w-auto group px-8 py-4 rounded font-bold uppercase tracking-wide border border-white/20 hover:border-gold-500/50 text-white bg-white/5 hover:bg-gold-500/10 backdrop-blur-sm transition duration-300 text-sm flex items-center justify-center gap-2" aria-label="Contact Us via Email">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-gold-500 group-hover:text-black transition">
+                <i className="fa-solid fa-envelope ml-0.5" aria-hidden="true"></i>
+              </div>
+              <span>Contact Us</span>
+            </a>
+          </div>
+
+          {/* Scroll Indicator positioned directly below hero buttons */}
+          <a
+            href="#about"
+            onClick={(e) => handleNavClick(e, '#about')}
+            className="mt-8 md:mt-10 flex flex-col items-center justify-center gap-1.5 text-gray-400 hover:text-gold-400 transition-colors duration-300 animate-pulse-slow cursor-pointer z-20 group fade-in-up"
+            style={{ animationDelay: '0.5s' }}
+            aria-label="Scroll down to About section"
+          >
+            <span className="text-[10px] md:text-xs font-semibold uppercase tracking-[0.3em] opacity-80 group-hover:opacity-100 transition-opacity">Scroll</span>
+            <i className="fa-solid fa-chevron-down text-base md:text-lg transform group-hover:translate-y-1 transition-transform duration-300" aria-hidden="true"></i>
+          </a>
+        </div>
+      </header>
+
+      {/* Brands / Social Proof */}
+      <section className="relative z-20 mt-10 md:mt-14 border-y border-white/10 bg-dark-900/60 backdrop-blur-md overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 py-10 lg:py-12">
+          <div className="flex items-center justify-center lg:justify-between mb-8">
+            <p className="text-center w-full text-xs font-semibold uppercase tracking-[0.25em] text-gray-400">
+              Trusted Platform Integrations & Tech Partners
+            </p>
+          </div>
+
+          <div className="relative w-full [mask-image:_linear-gradient(to_right,_transparent_0,_black_40px,_black_calc(100%-40px),_transparent_100%)] lg:[mask-image:none]">
+            <div
+              ref={brandsSliderRef}
+              id="brandsSlider"
+              className="flex lg:grid lg:grid-cols-9 lg:gap-4 gap-6 items-center lg:justify-items-center w-full overflow-x-auto lg:overflow-visible [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] py-4 lg:py-0 cursor-grab active:cursor-grabbing lg:cursor-auto"
+            >
+              {[
+                { name: 'Steam', src: '/platforms/steam.webp' },
+                { name: 'Xbox', src: '/platforms/xbox.webp' },
+                { name: 'PlayStation', src: '/platforms/playstation.webp' },
+                { name: 'Unity', src: '/platforms/unitygame.webp' },
+                { name: 'Unreal Engine', src: '/platforms/unrealengine.webp' },
+                { name: 'Meta Quest', src: '/platforms/meta.webp' },
+                { name: 'NVIDIA', src: '/platforms/nvidia.webp' },
+                { name: 'Autodesk', src: '/platforms/autodesk.webp' },
+                { name: 'Blender', src: '/platforms/blander.webp' },
+              ].map((brand, idx) => (
+                <div
+                  key={idx}
+                  title={brand.name}
+                  aria-label={brand.name}
+                  className="brand-item flex-shrink-0 flex items-center justify-center p-2 opacity-90 hover:opacity-100 transition-all duration-300 select-none group"
+                >
+                  <img
+                    src={brand.src}
+                    alt={brand.name}
+                    width={56}
+                    height={56}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-12 h-12 sm:w-14 sm:h-14 object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transform group-hover:scale-125 transition-transform duration-300"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <main id="main-content">
+        {/* About Section */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-28" id="about">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20 items-center">
+            <div className="lg:col-span-5 lg:sticky lg:top-24">
+              <span className="inline-flex items-center px-4 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-sm font-semibold tracking-widest uppercase">
+                About
+              </span>
+
+              <h2 className="mt-6 text-4xl md:text-5xl xl:text-6xl font-black leading-tight text-white">
+                Building the Future with{' '}
+                <span className="bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
+                  AI, Games & XR
+                </span>
+              </h2>
+
+              <p className="mt-8 text-lg leading-8 text-slate-300">
+                <strong className="text-white">The 14 Lights</strong> is an immersive technology powerhouse specializing in proprietary EdTech AI platforms, custom Game Development, and Extended Reality (XR). We bridge cutting-edge artificial intelligence with interactive 3D spatial computing to redefine digital education, enterprise training, and global gaming entertainment.
+              </p>
+              <p className="mt-4 text-sm leading-7 text-slate-400">
+                Our flagship product, <strong>eduraXR — Pakistan's Virtual AI Teacher</strong>, integrates real-time natural language processing, multilingual Urdu and English voice synthesis, and adaptive curriculum algorithms to deliver 1-on-1 personalized tutoring for schools and self-directed learners across Pakistan.
+              </p>
+            </div>
+
+            <div className="lg:col-span-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-amber-400/50 hover:-translate-y-2 transition-all duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6">
+                    <i className="fa-solid fa-gamepad text-amber-400 text-2xl"></i>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">🎮 Game Development</h3>
+                  <p className="text-slate-400 leading-7 text-sm">
+                    Full-cycle PC, Mobile, Console, and VR game engineering using <a href="https://www.unrealengine.com/" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline hover:text-amber-300">Unreal Engine 5</a> &amp; <a href="https://unity.com/" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline hover:text-amber-300">Unity</a>.
+                  </p>
+                </div>
+
+                <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-blue-400/50 hover:-translate-y-2 transition-all duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6">
+                    <i className="fa-solid fa-robot text-blue-400 text-2xl"></i>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">🤖 AI &amp; Virtual Reality</h3>
+                  <p className="text-slate-400 leading-7 text-sm">
+                    Interactive classroom avatars and localized <a href="https://ai.google/" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline hover:text-blue-300">Generative AI</a> models powering the Pakistan Virtual AI Teacher.
+                  </p>
+                </div>
+
+                <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-purple-400/50 hover:-translate-y-2 transition-all duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center mb-6">
+                    <i className="fa-solid fa-vr-cardboard text-purple-400 text-2xl"></i>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">🥽 XR Solutions</h3>
+                  <p className="text-slate-400 leading-7 text-sm">
+                    Immersive AR, VR, and Spatial Computing simulations designed for modern education, healthcare, and industrial workforce training.
+                  </p>
+                </div>
+
+                <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-green-400/50 hover:-translate-y-2 transition-all duration-300">
+                  <div className="w-16 h-16 rounded-2xl bg-green-500/10 flex items-center justify-center mb-6">
+                    <i className="fa-solid fa-laptop-code text-green-400 text-2xl"></i>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">🚀 Cross Platform</h3>
+                  <p className="text-slate-400 leading-7 text-sm">
+                    Multi-platform deployment spanning Meta Quest, Windows, Android, iOS, PlayStation, and Xbox.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Portfolio / Games Section */}
+        <section id="top-games" className="py-16 md:py-24 max-w-7xl mx-auto px-4 md:px-6 relative overflow-hidden" aria-label="Portfolio">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 md:mb-12 gap-6 relative z-20">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-display font-bold text-white">Our Portfolio</h2>
+              <p className="text-gray-400 mt-2 text-sm md:text-base">Award-winning titles developed and published by our team.</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2 p-1 bg-white/5 rounded-lg border border-white/10 backdrop-blur-sm self-start md:self-auto" role="tablist">
+              <button
+                onClick={() => setActiveTab('all')}
+                className={`px-4 py-2 rounded text-xs font-bold transition-all duration-300 ${activeTab === 'all' ? 'text-black bg-gold-500 shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                role="tab"
+                aria-selected={activeTab === 'all'}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setActiveTab('action')}
+                className={`px-4 py-2 rounded text-xs font-bold transition-all duration-300 ${activeTab === 'action' ? 'text-black bg-gold-500 shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                role="tab"
+                aria-selected={activeTab === 'action'}
+              >
+                Action
+              </button>
+              <button
+                onClick={() => setActiveTab('sports')}
+                className={`px-4 py-2 rounded text-xs font-bold transition-all duration-300 ${activeTab === 'sports' ? 'text-black bg-gold-500 shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                role="tab"
+                aria-selected={activeTab === 'sports'}
+              >
+                Sports
+              </button>
+              <button
+                onClick={() => setActiveTab('rpg')}
+                className={`px-4 py-2 rounded text-xs font-bold transition-all duration-300 ${activeTab === 'rpg' ? 'text-black bg-gold-500 shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                role="tab"
+                aria-selected={activeTab === 'rpg'}
+              >
+                RPG
+              </button>
+              <button
+                onClick={() => setActiveTab('coming_soon')}
+                className={`px-4 py-2 rounded text-xs font-bold transition-all duration-300 ${activeTab === 'coming_soon' ? 'text-black bg-gold-500 shadow-[0_0_15px_rgba(255,215,0,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                role="tab"
+                aria-selected={activeTab === 'coming_soon'}
+              >
+                Coming Soon
+              </button>
+            </div>
+          </div>
+
+          <div className="relative w-full [mask-image:_linear-gradient(to_right,_transparent_0,_black_40px,_black_calc(100%-40px),_transparent_100%)] lg:[mask-image:none]">
+            <div
+              ref={gamesGridRef}
+              id="gamesGrid"
+              className="flex lg:grid lg:grid-cols-4 gap-6 w-full overflow-x-auto lg:overflow-visible [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] py-4 lg:py-0 cursor-grab active:cursor-grabbing lg:cursor-auto items-stretch"
+            >
+              {/* Card 1: Rogue Strike */}
+              {(activeTab === 'all' || activeTab === 'action' || activeTab === 'coming_soon') && (
+                <article className="game-card original-card group relative bg-dark-800 rounded-xl overflow-hidden border border-white/5 hover:border-gold-500/30 transition duration-300 flex-shrink-0 w-[85vw] sm:w-[340px] lg:w-auto" data-category="action">
+                  <div className="aspect-[3/4] relative overflow-hidden bg-black/80 pointer-events-none flex items-center justify-center p-3 sm:p-4">
+                    <img src="https://i.ytimg.com/vi/-kyhy0ZcY6g/hqdefault.jpg" alt="Rogue Strike Game Cover" width={480} height={360} loading="lazy" decoding="async" draggable="false" className="w-full h-full object-contain p-2 blur-[4px] brightness-50 transition-all duration-500" />
+                    <div className="absolute inset-0 bg-black/40 z-10"></div>
+                    <div className="absolute inset-0 flex items-center justify-center z-20">
+                      <div className="px-6 py-3 rounded-full border border-gold-500/30 bg-black/70 backdrop-blur-md shadow-lg">
+                        <span className="text-gold-400 text-sm font-bold uppercase tracking-[0.2em]">Coming Soon</span>
+                      </div>
+                    </div>
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gold-400 border border-gold-500/20 z-30">TBA</div>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 w-full p-5 z-30 flex flex-col justify-end pointer-events-none">
+                    <span className="text-xs text-gold-500 font-bold uppercase tracking-wider mb-1 block">Action</span>
+                    <h3 className="text-xl font-bold text-white mb-2 leading-tight">Rogue Strike</h3>
+                    <p className="text-sm text-gray-400 mb-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 h-auto lg:h-0 lg:group-hover:h-auto overflow-hidden transition-all duration-300">
+                      An intense tactical action shooter currently in development.
+                    </p>
+                    <button disabled className="w-full py-2.5 rounded uppercase text-xs font-bold bg-white/5 border border-white/10 text-gray-500 cursor-not-allowed pointer-events-auto">
+                      Coming Soon
+                    </button>
+                  </div>
+                </article>
+              )}
+
+              {/* Card 2: Crazy FIFA 2026 */}
+              {(activeTab === 'all' || activeTab === 'sports') && (
+                <article
+                  onClick={() => onNavigate('game', 'crazy-fifa-2026')}
+                  className="game-card original-card group relative bg-dark-800 rounded-xl overflow-hidden border border-white/5 hover:border-gold-500/40 transition duration-300 flex-shrink-0 w-[85vw] sm:w-[340px] lg:w-auto cursor-pointer"
+                  data-category="sports"
+                >
+                  <div className="aspect-[3/4] relative overflow-hidden bg-black/80 pointer-events-none flex items-center justify-center p-3 sm:p-4">
+                    <img src={getCacheBustedUrl('/games/crazyfifa2026.webp')} alt="Crazy FIFA 2026 Game Cover" width={676} height={900} loading="lazy" draggable="false" className="w-full h-full object-contain p-2 transition duration-500 group-hover:scale-105 group-hover:opacity-40 z-20 relative" onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800';
+                    }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-90 z-30"></div>
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gold-400 border border-gold-500/20 z-30">4.9 ★</div>
+                    <div className="absolute top-3 left-3 flex items-center gap-2 z-30">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                      <span className="text-[10px] font-bold text-white uppercase tracking-wider drop-shadow-md">Unity WebGL</span>
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 w-full p-5 z-30 lg:translate-y-4 lg:group-hover:translate-y-0 transition duration-300 pointer-events-none">
+                    <span className="text-xs text-gold-500 font-bold uppercase tracking-wider mb-1 block">Sports & Football</span>
+                    <h3 className="text-xl font-bold text-white mb-2 leading-tight">Crazy FIFA 2026</h3>
+                    <p className="text-sm text-gray-400 mb-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 h-auto lg:h-0 lg:group-hover:h-auto overflow-hidden transition-all duration-300">
+                      High-speed 3D WebGL soccer featuring real-time AI teams, power shots, and stadium atmosphere.
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onNavigate('game', 'crazy-fifa-2026');
+                      }}
+                      className="block text-center w-full py-2.5 bg-white/10 hover:bg-gold-500 hover:text-black text-white text-xs font-bold rounded uppercase transition pointer-events-auto active:scale-95 cursor-pointer"
+                    >
+                      Play Game & Details
+                    </button>
+                  </div>
+                </article>
+              )}
+
+              {/* Card 3: Soccer Disc League */}
+              {(activeTab === 'all' || activeTab === 'sports') && (
+                <article
+                  onClick={() => onNavigate('game', 'soccer-disc-league')}
+                  className="game-card original-card group relative bg-black rounded-xl overflow-hidden border border-white/5 hover:border-gold-500/40 transition duration-300 flex-shrink-0 w-[85vw] sm:w-[340px] lg:w-auto cursor-pointer"
+                  data-category="sports"
+                >
+                  <div className="aspect-[3/4] relative overflow-hidden bg-black/80 pointer-events-none flex items-center justify-center p-3 sm:p-4">
+                    <img src={getCacheBustedUrl('/games/soccerdiscleague.webp')} alt="Soccer Disc League" width={677} height={369} loading="lazy" draggable="false" className="w-full h-full object-contain p-2 transition duration-500 group-hover:scale-105 group-hover:opacity-40 z-20 relative" onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?q=80&w=800';
+                    }} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-90 z-30"></div>
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gold-400 border border-gold-500/20 z-30">4.8 ★</div>
+                    <div className="absolute top-3 left-3 flex items-center gap-2 z-30">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                      <span className="text-[10px] font-bold text-white uppercase tracking-wider drop-shadow-md">HTML5 Physics</span>
+                    </div>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 w-full p-5 z-30 lg:translate-y-4 lg:group-hover:translate-y-0 transition duration-300 pointer-events-none">
+                    <span className="text-xs text-gold-500 font-bold uppercase tracking-wider mb-1 block">Tactical Strategy</span>
+                    <h3 className="text-xl font-bold text-white mb-2 leading-tight">Soccer Disc League</h3>
+                    <p className="text-sm text-gray-400 mb-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 h-auto lg:h-0 lg:group-hover:h-auto overflow-hidden transition-all duration-300">
+                      Turn-based disc football with precision physics trajectories and tactical team formations.
+                    </p>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onNavigate('game', 'soccer-disc-league');
+                      }}
+                      className="block w-full py-2.5 text-center bg-white/10 hover:bg-gold-500 hover:text-black text-white text-xs font-bold rounded uppercase transition pointer-events-auto active:scale-95 cursor-pointer"
+                    >
+                      Play Game & Details
+                    </button>
+                  </div>
+                </article>
+              )}
+
+              {/* Card 4: Veil of Mirrors */}
+              {(activeTab === 'all' || activeTab === 'action' || activeTab === 'coming_soon') && (
+                <article className="game-card original-card group relative bg-dark-800 rounded-xl overflow-hidden border border-white/5 hover:border-gold-500/30 transition duration-300 opacity-95 flex-shrink-0 w-[85vw] sm:w-[340px] lg:w-auto" data-category="action">
+                  <div className="aspect-[3/4] relative overflow-hidden bg-black/80 pointer-events-none flex items-center justify-center p-3 sm:p-4">
+                    <img src="https://i.ytimg.com/vi/BpnAFSeir5U/hq720.jpg" alt="Veil of Mirrors Game Cover" width={720} height={405} loading="lazy" draggable="false" className="w-full h-full object-contain p-2 blur-[4px] brightness-50 transition-all duration-500" />
+                    <div className="absolute inset-0 bg-black/40 z-10"></div>
+
+                    <div className="absolute inset-0 flex items-center justify-center z-30">
+                      <div className="px-6 py-3 rounded-full border border-gold-500/30 bg-black/70 backdrop-blur-md">
+                        <span className="text-gold-400 font-bold uppercase tracking-[0.2em] text-sm">Coming Soon</span>
+                      </div>
+                    </div>
+                    <div className="absolute top-3 right-3 bg-black/60 backdrop-blur px-2 py-1 rounded text-xs font-bold text-gold-400 border border-gold-500/20 z-30">TBA</div>
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 w-full p-5 z-30 pointer-events-none">
+                    <span className="text-xs text-gold-500 font-bold uppercase tracking-wider mb-1 block">Action</span>
+                    <h3 className="text-xl font-bold text-white mb-2">Veil of Mirrors</h3>
+                    <p className="text-sm text-gray-400 mb-4 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 h-auto lg:h-0 lg:group-hover:h-auto overflow-hidden transition-all duration-300">
+                      A new cinematic action adventure is currently in development.
+                    </p>
+                    <button disabled className="w-full py-2.5 rounded uppercase text-xs font-bold bg-white/5 text-gray-500 cursor-not-allowed border border-white/10 pointer-events-auto">
+                      Coming Soon
+                    </button>
+                  </div>
+                </article>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-12 text-center relative z-20">
+            <button onClick={() => onNavigate('game', 'crazy-fifa-2026')} className="inline-block border-b border-gray-600 text-gray-400 hover:text-white hover:border-white pb-1 transition uppercase text-xs font-bold tracking-widest cursor-pointer">Explore Full Gaming Arena</button>
+          </div>
+        </section>
+
+        {/* Meet the Team Section */}
+        <section id="team" className="relative min-h-screen flex items-center justify-center py-20 md:py-32 bg-black overflow-hidden" aria-label="Meet the Team Members">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900/40 via-black to-black pointer-events-none"></div>
+
+          <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12 md:mb-18 flex flex-col items-center">
+              <span className="inline-block py-1.5 px-4 rounded-full bg-gold-500/5 border border-gold-500/20 text-xs font-bold text-gold-500 uppercase tracking-[0.2em] mb-5 shadow-[0_0_20px_rgba(212,175,55,0.05)] backdrop-blur-sm">
+                The Creators
+              </span>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-400 tracking-tight">
+                Meet the Team
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12 xl:gap-y-14">
+              {[
+                { name: 'Hassan Noor Soomro', role: 'Founder & System Designer', bio: 'Architect behind Pakistan Virtual AI Teacher and core system architecture.', img: hassanProfileImg },
+                { name: 'Anum Shakeel', role: 'Chief Marketing Officer', bio: 'Directing global brand strategy, growth, and EdTech partnerships.', img: '/team/anum.webp' },
+                { name: 'Dr Danish Nazir', role: '3D Artist & Developer', bio: 'Specializing in high-fidelity 3D modeling, spatial rendering, and VR assets.', img: '/team/Danish.webp' },
+                { name: 'Ali', role: 'Animator & Rigger', bio: 'Expert in character rigging, facial capture, and smooth avatar locomotion.', img: '/team/Ali%20Animator%20and%20Rigger.webp' },
+                { name: 'Ahmed Shahab', role: 'UI/UX Game Designer', bio: 'Designing intuitive player interfaces and fluid mobile touch controls.', img: '/team/ahmed.webp' },
+                { name: 'Muhammad Sheroz', role: 'Security Expert', bio: 'Ensuring enterprise-grade data privacy, cloud protection, and server resilience.', img: '/team/sheroz.webp' },
+              ].map((member, idx) => (
+                <div key={idx} className="group flex flex-col items-center text-center transition-all duration-500 hover:-translate-y-2">
+                  <div className="relative w-36 h-36 md:w-40 md:h-40 mb-6">
+                    <div className="absolute inset-0 rounded-full border border-gold-500/20 group-hover:border-gold-500/80 group-hover:shadow-[0_0_30px_rgba(212,175,55,0.2)] transition-all duration-700 group-hover:animate-[spin_12s_linear_infinite] z-10"></div>
+                    <div className="absolute inset-1 rounded-full overflow-hidden bg-neutral-900">
+                      <img
+                        src={getCacheBustedUrl(member.img)}
+                        alt={`${member.name} - ${member.role}`}
+                        width={160}
+                        height={160}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        onError={(e) => {
+                          const target = e.currentTarget;
+                          if (member.name === 'Hassan Noor Soomro' && !target.src.includes('profile.png')) {
+                            target.src = '/assets/profile.png';
+                          }
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold text-white mb-1 transition-colors duration-300 group-hover:text-gold-500">
+                    {member.name}
+                  </h3>
+                  <p className="text-xs md:text-sm text-neutral-400 font-medium uppercase tracking-[0.15em] mb-2">
+                    {member.role}
+                  </p>
+                  <p className="text-xs text-neutral-500 max-w-xs leading-relaxed">
+                    {member.bio}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Pitch Banner */}
+        <div id="contact" className="mt-0 mb-16 mx-4 sm:mx-16 pt-8 pb-8 pr-8 pl-[33px] rounded-[2rem] bg-gradient-to-r from-neutral-950 to-neutral-900 border border-white/5 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="text-center md:text-left">
+            <h3 className="text-xl font-bold text-white mb-1 tracking-tight">Ready to start a project?</h3>
+            <p className="text-neutral-400 text-sm">Our specialists are currently accepting high-profile collaborations.</p>
+          </div>
+          <a href="mailto:hello@the14lights.com" className="w-full md:w-auto px-10 py-4 bg-gold-500 text-black text-xs font-black uppercase tracking-[0.2em] rounded-full shadow-[0_10px_30px_rgba(212,175,55,0.2)] hover:scale-105 hover:bg-white transition-all duration-300 text-center inline-block" aria-label="Get In Touch via Email">
+            Get In Touch
+          </a>
+        </div>
+
+        {/* 100+ Happy Clients */}
+        <section id="clients" className="py-10 md:py-14 bg-dark-900/30 relative overflow-hidden" aria-label="100+ Happy Clients">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute -top-24 left-1/3 w-80 h-80 bg-gold-500/5 blur-3xl rounded-full"></div>
+            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-gold-500/5 blur-3xl rounded-full"></div>
+          </div>
+
+          <div className="relative max-w-7xl mx-auto px-4 md:px-6">
+            {/* Upper Same Section (CSS selector 2) */}
+            <div className="text-center mb-6 sm:mb-8">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-400 text-xs font-semibold uppercase tracking-widest mb-3 shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-gold-400 animate-pulse"></span>
+                <span>Client Success &amp; Trust</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold text-white tracking-tight">
+                100+ <span className="text-transparent bg-clip-text bg-gradient-to-r from-gold-400 via-amber-300 to-gold-500">Happy Clients</span> Worldwide
+              </h2>
+              <p className="mt-2.5 text-gray-400 max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed">
+                From indie game innovators and EdTech pioneers to spatial computing teams across 18+ countries, over 100+ clients rely on The 14 Lights for high-performance interactive games, virtual AI classrooms, and XR applications.
+              </p>
+
+              {/* High-Impact Proof Metrics Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-3xl mx-auto mt-5 sm:mt-6">
+                <div className="glass-panel p-3.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm text-center">
+                  <div className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-amber-300">100+</div>
+                  <div className="text-xs sm:text-sm font-semibold text-white mt-1">Happy Clients</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">Gaming, VR &amp; EdTech</div>
+                </div>
+                <div className="glass-panel p-3.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm text-center">
+                  <div className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-amber-300">98.7%</div>
+                  <div className="text-xs sm:text-sm font-semibold text-white mt-1">Satisfaction Rate</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">Across 120+ deliverables</div>
+                </div>
+                <div className="glass-panel p-3.5 sm:p-4 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm text-center">
+                  <div className="text-2xl sm:text-3xl font-display font-black text-transparent bg-clip-text bg-gradient-to-r from-gold-400 to-amber-300">4.8 ★</div>
+                  <div className="text-xs sm:text-sm font-semibold text-white mt-1">Average Rating</div>
+                  <div className="text-[11px] text-gray-400 mt-0.5">Verified milestone delivery</div>
+                </div>
+              </div>
+
+              {/* Delivery Domains Pill Bar */}
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+                {[
+                  'Unreal Engine 5 Architecture',
+                  'Meta Quest VR & XR',
+                  'Edura XR AI Classrooms',
+                  'Unity WebGL Multiplayer',
+                  'Interactive 3D Simulation',
+                ].map((tag, tagIdx) => (
+                  <span
+                    key={tagIdx}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-white/5 border border-white/10 text-gray-300"
+                  >
+                    <i className="fa-solid fa-check text-gold-400 text-[10px]"></i>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Below: Dedicated Responsive 0-to-100% Progress Bar (CSS selector 1) */}
+            <div
+              ref={progressSectionRef}
+              className="max-w-3xl mx-auto mt-6 sm:mt-8 p-5 sm:p-6 rounded-2xl border border-white/10 bg-[#09090d]/80 backdrop-blur-xl shadow-xl relative overflow-hidden"
+            >
+              {/* Subtle ambient back-glow */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gold-500/[0.04] blur-3xl rounded-full pointer-events-none -mr-16 -mt-16"></div>
+
+
+
+              {/* The Smooth Logo-Consistent Progress Track */}
+              <div className="relative w-full h-4 sm:h-5 bg-[#050508] rounded-full border border-gold-500/25 p-0.5 overflow-hidden shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] relative z-10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#AA8C2C] via-[#D4AF37] via-[#E6C75A] to-[#FCEBA4] relative overflow-hidden shadow-[0_0_20px_rgba(212,175,55,0.45)] transition-[width] duration-75 ease-out"
+                  style={{ width: `${clientProgress}%` }}
+                  role="progressbar"
+                  aria-valuenow={clientProgress}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label="100+ Happy Clients Progress Bar"
+                >
+                  {/* Logo-consistent radiant highlight sweep */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-[pulse_2s_ease-in-out_infinite]"></div>
+                </div>
+              </div>
+
+              {/* Minimal Clean Scale Labels */}
+              <div className="flex items-center justify-between text-xs font-mono text-gray-400 mt-2.5 relative z-10">
+                <span className="text-gray-400 text-[11px] sm:text-xs">Proven Global Delivery</span>
+                <span className="text-gold-400 font-semibold text-[11px] sm:text-xs flex items-center gap-1.5">
+                  <i className="fa-solid fa-circle-check text-gold-400 text-xs"></i> 100+ Happy Clients
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-black border-t border-white/10 pt-14 md:pt-20 pb-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-2">
+              <div className="inline-flex items-center gap-4 text-left">
+                <div className="w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center p-2 bg-white ring-2 ring-gold-400/40 shadow-lg">
+                    <picture className="w-full h-full flex items-center justify-center">
+                    <source srcSet="/assets/VR_LOGO.webp" type="image/webp" />
+                    <img
+                      src={vrLogo}
+                      alt="The 14 Lights Logo"
+                      width={56}
+                      height={56}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        const fallbacks = ['/assets/VR_LOGO.webp', '/VR_LOGO.webp', '/assets/VR_LOGO.png', '/favicon.png'];
+                        const step = parseInt(target.dataset.fallbackStep || '0', 10);
+                        if (step < fallbacks.length) {
+                          target.dataset.fallbackStep = String(step + 1);
+                          target.src = fallbacks[step];
+                        } else {
+                          target.onerror = null;
+                        }
+                      }}
+                    />
+                  </picture>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-display font-bold text-white tracking-wide">
+                    The <span className="text-gold-500">14 Lights</span>
+                  </h3>
+                  <p className="text-sm text-gray-400">AI • Games • XR • Digital Innovation</p>
+                </div>
+              </div>
+
+              <p className="mt-7 max-w-2xl text-gray-400 leading-8 text-sm">
+                <span className="text-white font-medium">The 14 Lights</span> is an immersive technology company specializing in game development, AI, Virtual Reality, and XR solutions. We build innovative experiences for gaming, education, training, and enterprise.
+              </p>
+
+              <nav className="mt-8">
+                <ul className="flex flex-wrap gap-x-8 gap-y-3 text-sm">
+                  <li><a href="#about" onClick={(e) => handleNavClick(e, '#about')} className="text-gray-400 hover:text-gold-500 transition">About Us</a></li>
+                  <li><a href="#clients" onClick={(e) => handleNavClick(e, '#clients')} className="text-gray-400 hover:text-gold-500 transition">Clients</a></li>
+                  <li><button onClick={() => onNavigate('newsletter')} className="text-gold-400 font-bold hover:text-gold-300 transition">Newsletter</button></li>
+                  <li><button onClick={() => onNavigate('blog')} className="text-gray-400 hover:text-gold-500 transition">Blog</button></li>
+                  <li><button onClick={() => onNavigate('privacy')} className="text-gray-400 hover:text-gold-500 transition" aria-label="Privacy Policy">Privacy Policy</button></li>
+                  <li><a href="mailto:hello@the14lights.com" className="text-gray-400 hover:text-gold-500 transition">Contact</a></li>
+                </ul>
+              </nav>
+            </div>
+
+            <div>
+              <h3 className="text-white text-lg font-semibold mb-6">Contact Information</h3>
+              <div className="space-y-5">
+                <a href="mailto:hello@the14lights.com" className="flex items-start gap-4 group cursor-pointer" aria-label="Email Us at hello@the14lights.com">
+                  <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gold-500 group-hover:bg-gold-500 group-hover:text-black transition">
+                    <i className="fa-solid fa-envelope"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-gray-400">Email</p>
+                    <p className="text-white text-sm group-hover:text-gold-500 transition">hello@the14lights.com</p>
+                  </div>
+                </a>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-11 h-11 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gold-500">
+                    <i className="fa-solid fa-location-dot"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-widest text-gray-400">Location</p>
+                    <p className="text-white text-sm">Karachi, Pakistan</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <h4 className="text-white font-medium mb-4">Follow Us</h4>
+                <div className="flex gap-3">
+                  <a href="https://www.facebook.com/profile.php?id=100087743332604" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-gray-300 hover:bg-gold-500 hover:border-gold-500 hover:text-black transition" aria-label="Facebook Page"><i className="fab fa-facebook-f"></i></a>
+                  <a href="https://discord.gg/6kuByeGNm" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-gray-300 hover:bg-gold-500 hover:border-gold-500 hover:text-black transition" aria-label="Discord Server"><i className="fab fa-discord"></i></a>
+                  <a href="https://wa.me/923163394180" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-gray-300 hover:bg-gold-500 hover:border-gold-500 hover:text-black transition" aria-label="WhatsApp - +92 316 3394180"><i className="fab fa-whatsapp"></i></a>
+                  <a href="https://pk.linkedin.com/company/the14lights" target="_blank" rel="noopener noreferrer" className="w-11 h-11 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center text-gray-300 hover:bg-gold-500 hover:border-gold-500 hover:text-black transition" aria-label="LinkedIn Company Page"><i className="fab fa-linkedin-in"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-14 pt-6 border-t border-white/10">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-5">
+              <p className="text-sm text-gray-400 text-center md:text-left">
+                © 2026 <span className="text-white font-medium">The 14 Lights.</span> Building the Future with AI, Games & XR.
+              </p>
+              <div className="flex items-center gap-6 text-sm">
+                <button onClick={() => onNavigate('privacy')} className="text-gray-400 hover:text-gold-500 transition cursor-pointer" aria-label="Terms of Service">Terms of Service</button>
+                <button onClick={() => onNavigate('privacy')} className="text-gray-400 hover:text-gold-500 transition cursor-pointer" aria-label="Privacy Policy">Privacy Policy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* Embedded Game Player Modal */}
+      <GamePlayerModal
+        isOpen={activeGameModal.isOpen}
+        onClose={() => setActiveGameModal({ isOpen: false, title: '', url: '' })}
+        gameTitle={activeGameModal.title}
+        gameUrl={activeGameModal.url}
+      />
+    </div>
+  );
+};

@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix Latest The 14 Lights Studio",
+  "description": "The 14 Lights - Game Development, AI, XR \u0026 Digital Agency",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "The 14 Lights",
+  "short_name": "14 Lights",
+  "description": "Pioneering Edura XR (Pakistan's Virtual AI Teacher on Meta Quest) and premier Unreal Engine 5 game development.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#06070B",
+  "theme_color": "#06070B",
+  "icons": [
+    {
+      "src": "/assets/VR_LOGO.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/VR_LOGO.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ]
+}

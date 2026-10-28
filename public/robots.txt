@@ -1,0 +1,99 @@
+# ==============================================================================
+# The 14Lights - Production Robots Configuration
+# Base Domain: https://the14lights.com
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Default Rules for Global Web Crawlers
+# ------------------------------------------------------------------------------
+User-agent: *
+Allow: /
+Allow: /llms.txt
+Allow: /sitemap.xml
+Disallow: /api/
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# ------------------------------------------------------------------------------
+# Googlebot Specific Rules
+# ------------------------------------------------------------------------------
+User-agent: Googlebot
+User-agent: Googlebot-Image
+User-agent: Googlebot-Video
+User-agent: Googlebot-News
+Allow: /
+Allow: /assets/
+Allow: /public/
+Disallow: /api/
+Disallow: /admin/
+
+# ------------------------------------------------------------------------------
+# Bingbot Specific Rules
+# ------------------------------------------------------------------------------
+User-agent: Bingbot
+User-agent: msnbot
+Allow: /
+Allow: /assets/
+Disallow: /api/
+Disallow: /admin/
+
+# ------------------------------------------------------------------------------
+# Applebot Specific Rules
+# ------------------------------------------------------------------------------
+User-agent: Applebot
+Allow: /
+Disallow: /api/
+
+# ------------------------------------------------------------------------------
+# Explicit Generative Engine Optimization (GEO) & AI Search Crawlers
+# ------------------------------------------------------------------------------
+User-agent: Google-Extended
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Amazonbot
+Allow: /
+
+User-agent: Cohere-ai
+Allow: /
+
+User-agent: Meta-ExternalAgent
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+# ------------------------------------------------------------------------------
+# LLM Knowledge Base Reference
+# ------------------------------------------------------------------------------
+# Machine-readable knowledge context: https://the14lights.com/llms.txt
+
+# ------------------------------------------------------------------------------
+# Canonical XML Sitemap
+# ------------------------------------------------------------------------------
+Sitemap: https://the14lights.com/sitemap.xml

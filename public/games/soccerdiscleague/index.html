@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no">
+    <title>Soccer Disc League | Unity WebGL Game</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #090d16;
+        color: #ffffff;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      }
+      #gameWrapper {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at center, #0f172a 0%, #090d16 100%);
+      }
+      #unity-container {
+        width: 100% !important;
+        height: 100% !important;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+      }
+      #unity-canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block;
+      }
+
+      /* Custom Loading Screen Overlay */
+      #loadingOverlay {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: rgba(9, 13, 22, 0.96);
+        backdrop-filter: blur(8px);
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+        padding: 24px;
+        text-align: center;
+      }
+      #loadingOverlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .logo-ring {
+        position: relative;
+        width: 80px;
+        height: 80px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .spinner-ring {
+        position: absolute;
+        inset: 0;
+        border: 4px solid rgba(16, 185, 129, 0.15);
+        border-top-color: #10b981;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      .logo-icon {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .loading-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+      }
+      .loading-subtitle {
+        font-size: 13px;
+        color: #94a3b8;
+        margin-bottom: 24px;
+        max-width: 360px;
+      }
+
+      .progress-bar-container {
+        width: 100%;
+        max-width: 320px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 12px;
+        position: relative;
+      }
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+        border-radius: 12px;
+        transition: width 0.2s ease;
+      }
+      .progress-text {
+        font-size: 13px;
+        font-weight: 600;
+        color: #34d399;
+        letter-spacing: 0.5px;
+      }
+
+      /* Error Overlay */
+      #errorOverlay {
+        position: absolute;
+        inset: 0;
+        z-index: 20;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #090d16;
+        padding: 32px;
+        text-align: center;
+      }
+      #errorOverlay.active {
+        display: flex;
+      }
+      .error-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: rgba(239, 68, 68, 0.15);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 16px;
+      }
+      .error-heading {
+        font-size: 20px;
+        font-weight: 700;
+        color: #f87171;
+        margin-bottom: 8px;
+      }
+      .error-desc {
+        font-size: 14px;
+        color: #9ca3af;
+        max-width: 420px;
+        margin-bottom: 24px;
+        line-height: 1.5;
+      }
+      .retry-btn {
+        background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 14px;
+        padding: 12px 28px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .retry-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="gameWrapper">
+      <!-- Loading Screen -->
+      <div id="loadingOverlay">
+        <div class="logo-ring">
+          <div class="spinner-ring"></div>
+          <img src="/games/soccerdiscleague.webp" alt="Soccer Disc League" class="logo-icon" onerror="this.style.display='none'" />
+        </div>
+        <div class="loading-title">Soccer Disc League</div>
+        <div class="loading-subtitle" id="statusMessage">Downloading Unity WebGL engine & game assets...</div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">0%</div>
+      </div>
+
+      <!-- Error Screen -->
+      <div id="errorOverlay">
+        <div class="error-icon">!</div>
+        <div class="error-heading">Unable to Load WebGL Game</div>
+        <div class="error-desc" id="errorMessage">WebGL is required to play Soccer Disc League. Please make sure hardware acceleration and WebGL are enabled in your browser settings.</div>
+        <button class="retry-btn" onclick="location.reload()">Retry Loading</button>
+      </div>
+
+      <!-- Unity Game Container -->
+      <div id="unity-container" class="unity-desktop">
+        <canvas id="unity-canvas" width="800" height="480" tabindex="-1"></canvas>
+      </div>
+    </div>
+
+    <script>
+      (function() {
+        var container = document.querySelector("#unity-container");
+        var canvas = document.querySelector("#unity-canvas");
+        var progressBar = document.getElementById('progressBar');
+        var progressText = document.getElementById('progressText');
+        var statusMessage = document.getElementById('statusMessage');
+        var loadingOverlay = document.getElementById('loadingOverlay');
+        var errorOverlay = document.getElementById('errorOverlay');
+        var errorMessage = document.getElementById('errorMessage');
+
+        function showError(msg) {
+          if (loadingOverlay) loadingOverlay.classList.add('hidden');
+          if (errorMessage && msg) {
+            errorMessage.textContent = msg;
+          }
+          if (errorOverlay) errorOverlay.classList.add('active');
+        }
+
+        function unityShowBanner(msg, type) {
+          console.log('[Unity ' + type + ']:', msg);
+        }
+
+        // Check WebGL Support
+        function checkWebGL() {
+          try {
+            var testCanvas = document.createElement('canvas');
+            var gl = testCanvas.getContext('webgl2') || testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+            return !!gl;
+          } catch (e) {
+            return false;
+          }
+        }
+
+        if (!checkWebGL()) {
+          showError('Your browser or graphic card does not support WebGL. Please update your browser or enable hardware acceleration.');
+          return;
+        }
+
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          container.className = "unity-mobile";
+          canvas.className = "unity-mobile";
+        }
+
+        var buildUrl = "Build";
+        var loaderUrl = buildUrl + "/BuildGame.loader.js";
+        var config = {
+          dataUrl: buildUrl + "/BuildGame.data",
+          frameworkUrl: buildUrl + "/BuildGame.framework.js",
+          codeUrl: buildUrl + "/BuildGame.wasm",
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: "The14Lights",
+          productName: "FingerFIFA",
+          productVersion: "1.71",
+          showBanner: unityShowBanner,
+        };
+
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = function() {
+          if (typeof createUnityInstance === 'undefined') {
+            showError('createUnityInstance function not found. Please refresh and try again.');
+            return;
+          }
+
+          createUnityInstance(canvas, config, function(progress) {
+            var pct = Math.round(progress * 100);
+            if (progressBar) progressBar.style.width = pct + '%';
+            if (progressText) progressText.textContent = pct + '%';
+
+            if (progress < 0.3) {
+              if (statusMessage) statusMessage.textContent = 'Downloading WebGL engine files...';
+            } else if (progress < 0.8) {
+              if (statusMessage) statusMessage.textContent = 'Loading stadium pitch & disc models...';
+            } else if (progress < 1.0) {
+              if (statusMessage) statusMessage.textContent = 'Initializing physics & match audio...';
+            } else {
+              if (statusMessage) statusMessage.textContent = 'Match Ready! Launching game...';
+            }
+          }).then(function(unityInstance) {
+            window.unityInstance = unityInstance;
+            if (loadingOverlay) {
+              setTimeout(function() {
+                loadingOverlay.classList.add('hidden');
+              }, 400);
+            }
+          }).catch(function(err) {
+            console.error('Error launching Soccer Disc League:', err);
+            showError('Failed to launch Unity WebGL engine: ' + (err.message || err));
+          });
+        };
+
+        script.onerror = function() {
+          showError('Failed to load BuildGame.loader.js. Please check network connection and reload.');
+        };
+
+        document.body.appendChild(script);
+
+        // Fallback safety timeout
+        setTimeout(function() {
+          if (loadingOverlay && !loadingOverlay.classList.contains('hidden') && (!errorOverlay || !errorOverlay.classList.contains('active'))) {
+            loadingOverlay.classList.add('hidden');
+          }
+        }, 15000);
+      })();
+    </script>
+  </body>
+</html>

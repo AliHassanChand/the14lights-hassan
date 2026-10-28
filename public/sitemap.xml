@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd
+        http://www.google.com/schemas/sitemap-image/1.1
+        http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://the14lights.com/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://the14lights.com/assets/VR_LOGO.webp</image:loc>
+      <image:title>The 14Lights - AI &amp; Game Development</image:title>
+      <image:caption>Official logo and branding of The 14Lights.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Newsletter: Edura XR Feature Report -->
+  <url>
+    <loc>https://the14lights.com/newsletter</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://the14lights.com/assets/eduraxr_classroom.jpg</image:loc>
+      <image:title>Edura XR Virtual AI Teacher Classroom for Meta Quest</image:title>
+      <image:caption>The 3D classroom space in Edura XR built for students to interact in using voice and virtual reality.</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Blog Listing -->
+  <url>
+    <loc>https://the14lights.com/blog</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Flagship Pillar Article: Pakistan's First Virtual AI Teacher Guide -->
+  <url>
+    <loc>https://the14lights.com/article/ai-virtual-teacher-edtech-pakistan-guide</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <image:image>
+      <image:loc>https://the14lights.com/assets/eduraxr_classroom.jpg</image:loc>
+      <image:title>Pakistan's First Virtual AI Teacher Architecture Guide</image:title>
+      <image:caption>Comprehensive blueprint of Edura XR: Generative AI, spatial 3D classrooms, and bilingual NLP.</image:caption>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://the14lights.com/article/pakistan-first-virtual-ai-teacher</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://the14lights.com/article/generative-ai-unreal-engine-5-vr-game-development</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url>
+    <loc>https://the14lights.com/article/article-spotlight</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Interactive Games & WebGL Playable Portfolios -->
+  <url>
+    <loc>https://the14lights.com/game/crazy-fifa-2026</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://the14lights.com/game/soccer-disc-league</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Technical Dispatches & Engineering Articles -->
+  <url>
+    <loc>https://the14lights.com/article/real-time-tournament-brackets</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the14lights.com/article/flick-and-shoot-mechanics</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the14lights.com/article/scaling-cloud-infrastructure</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the14lights.com/article/article-1</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the14lights.com/article/article-2</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://the14lights.com/article/article-3</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://the14lights.com/privacy</loc>
+    <lastmod>2026-10-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

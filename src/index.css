@@ -1,0 +1,337 @@
+@import "tailwindcss";
+
+@theme {
+  --color-gold-400: #E6C75A;
+  --color-gold-500: #D4AF37;
+  --color-gold-600: #AA8C2C;
+  --color-gold-900: #3D3210;
+
+  --color-dark-950: #050507;
+  --color-dark-900: #0A0A0F;
+  --color-dark-800: #12121A;
+
+  --font-sans: 'Poppins', sans-serif;
+  --font-display: 'Orbitron', sans-serif;
+  --font-heading: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --gold-primary: #D4AF37;
+  --gold-glow: rgba(212, 175, 55, 0.4);
+}
+
+/* Professional Education + VR Heading Font System for Articles & Publications */
+.font-heading {
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.022em;
+}
+
+/* Ensure all headings across blog and article pages use the professional, refined Education + VR typography */
+body.blog-page .font-display,
+body.blog-page .font-heading,
+body.blog-page h1,
+body.blog-page h2,
+body.blog-page h3,
+body.blog-page h4,
+body.blog-page h5,
+body.blog-page h6 {
+  font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body.blog-page h1 {
+  letter-spacing: -0.028em;
+}
+
+body.blog-page h2 {
+  letter-spacing: -0.022em;
+}
+
+body.blog-page h3 {
+  letter-spacing: -0.018em;
+}
+
+body.blog-page h4 {
+  letter-spacing: -0.015em;
+}
+
+/* Home Dark Theme Styles */
+body.home-page {
+  background-color: #06070b;
+  color: #e6eef8;
+  background-image: radial-gradient(circle at 50% 0%, #15192c 0%, #06070b 65%);
+  background-attachment: fixed;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body.home-page .text-gradient-gold {
+  background: linear-gradient(135deg, #F9E7A2 0%, #D4AF37 50%, #9B7C22 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0px 2px 12px rgba(212, 175, 55, 0.25);
+}
+
+body.home-page .glass-panel {
+  background: rgba(14, 17, 32, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(51, 65, 85, 0.8);
+  box-shadow: 0 8px 32px -2px rgba(0, 0, 0, 0.5);
+}
+
+body.home-page .glass-panel:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+body.home-page .nav-glass {
+  background: rgba(8, 10, 18, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(51, 65, 85, 0.7);
+}
+
+body.home-page .btn-gold {
+  background: linear-gradient(90deg, #D4AF37 0%, #B59328 100%);
+  color: #050507;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Blog Light Theme Styles - Ultra Crisp & High-Contrast Clarity */
+body.blog-page {
+  background-color: #F8FAFC;
+  color: #1E293B;
+  background-image: radial-gradient(circle at 50% 0%, #EDF2F7 0%, #F8FAFC 55%);
+  background-attachment: fixed;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+body.blog-page .text-gradient-gold {
+  background: linear-gradient(135deg, #B59328 0%, #8C6D18 50%, #5E480C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0px 2px 8px rgba(181, 147, 40, 0.15);
+}
+
+body.blog-page .glass-panel {
+  background: #FFFFFF;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body.blog-page .glass-panel:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  box-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.12), 0 0 20px rgba(212, 175, 55, 0.15);
+}
+
+body.blog-page .nav-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid #E2E8F0;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+
+body.blog-page .btn-gold {
+  background: linear-gradient(90deg, #D4AF37 0%, #B59328 100%);
+  color: #090B14;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Common Button Sheen effect */
+.btn-gold::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+  will-change: transform;
+}
+
+.btn-gold:hover::before {
+  transform: translateX(100%);
+}
+
+.btn-gold:hover {
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Card 3D Effect */
+.card-3d {
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  will-change: transform;
+}
+
+.card-3d:hover {
+  transform: translateY(-8px);
+}
+
+/* Card Scale Effect */
+.card-scale {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  will-change: transform;
+}
+
+.card-scale:hover {
+  transform: translateY(-4px);
+}
+
+/* Reading Progress Indicator */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #D4AF37, #AA8C2C);
+  width: 100%;
+  z-index: 100;
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.1s ease-out;
+  will-change: transform;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+body.home-page ::-webkit-scrollbar-track {
+  background: #050507;
+}
+
+body.blog-page ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+body.home-page ::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+body.blog-page ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+/* Glitch Text Effect */
+.glitch-text {
+  position: relative;
+}
+
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .glitch-text::before,
+  .glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #050507;
+    will-change: transform, clip-path;
+  }
+
+  .glitch-text::before {
+    transform: translateX(2px);
+    text-shadow: -1px 0 #ff00c1;
+    clip-path: inset(44px 0 56px 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+  }
+
+  .glitch-text::after {
+    transform: translateX(-2px);
+    text-shadow: -1px 0 #00fff9;
+    clip-path: inset(44px 0 56px 0);
+    animation: glitch-anim2 5s infinite linear alternate-reverse;
+  }
+}
+
+@keyframes glitch-anim {
+  0% { clip-path: inset(61px 0 52px 0); }
+  5% { clip-path: inset(33px 0 11px 0); }
+  100% { clip-path: inset(15px 0 12px 0); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip-path: inset(2px 0 86px 0); }
+  5% { clip-path: inset(82px 0 14px 0); }
+  100% { clip-path: inset(12px 0 66px 0); }
+}
+
+/* Neon Box */
+.neon-box {
+  position: relative;
+  background: #0A0A0F;
+  z-index: 1;
+}
+
+.neon-box::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  background: linear-gradient(45deg, #D4AF37, transparent, #2563eb);
+  border-radius: inherit;
+  opacity: 0.5;
+}
+
+/* Skip Link */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #D4AF37;
+  color: #000;
+  padding: 8px 16px;
+  z-index: 100;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Fade in animation - visible by default to eliminate LCP delay */
+.fade-in-up {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0.8;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

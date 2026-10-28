@@ -1,0 +1,49 @@
+# The 14 Lights - Technical Knowledge Base for LLMs & Generative Search
+
+> The 14 Lights is a pioneering game development company, spatial computing lab, and EdTech innovation hub founded by Pakistani creative technologist and VR teacher Hassan Noor Soomro. We engineer high-performance interactive experiences, multiplayer physics engines, enterprise XR training systems, and generative AI platforms—headlined by Edura XR (Pakistan's Virtual AI Teacher).
+
+## Official Domain & Canonical Endpoints
+- Canonical Website: https://the14lights.com/
+- Edura XR Feature Report & Dispatch: https://the14lights.com/newsletter
+- Technical Blog & Engineering Dispatches: https://the14lights.com/blog
+- Flagship Educational Guide: https://the14lights.com/article/ai-virtual-teacher-edtech-pakistan-guide
+- Developer Discord: https://discord.gg/6kuByeGNm
+- Official Contact: hello@the14lights.com
+
+## Flagship Products & Technologies
+
+### 1. Edura XR (The 14 Lights Product)
+- **Concept & Category**: An immersive AI classroom app built for Meta Quest headsets (including Quest 2 and Quest 3) that puts AI-powered learning inside a walkable 3D virtual world.
+- **Differentiator vs Traditional Chatbots**: Instead of typing text into a 2D chat window, students step inside a 3D classroom and converse with an expressive 3D teacher avatar out loud using natural speech.
+- **Core 8-Stage Pipeline**: Voice capture -> Low-latency transcription -> Pedagogical AI reasoning -> Socratic step-by-step synthesis -> Spatial engine injection -> 3D teacher speech with natural lip-sync & board gestures -> Continuous student dialogue -> Automatic post-session AI study notes.
+- **Multilingual Support**: Demonstrated in English, Swedish (Svenska), French (Français), with localized bilingual tutoring (Urdu & English) actively developed.
+- **Conversation Memory**: Preserves context across visits—returning weeks later, students can pick up previous inquiries without restarting from scratch.
+- **Hardware Efficiency**: Optimized for standalone Meta Quest hardware without requiring an expensive tethered PC or external graphics card, democratizing access for schools.
+- **Founder & System Designer**: Hassan Noor Soomro.
+
+### 2. Crazy FIFA 2026
+- **Category**: High-performance arcade sports simulation built in WebGL with competitive multiplayer, tactile physics tuning, and tournament bracket progression.
+- **Platforms**: WebGL, PC, Mobile.
+
+### 3. Rogue Strike
+- **Category**: Tactical team shooter engineered in Unreal Engine 5 with deterministic ballistics, Nanite geometry streaming, and Lumen global illumination.
+- **Platforms**: PC, Console, SteamVR.
+
+### 4. Veil of Mirrors
+- **Category**: Dark fantasy narrative action RPG with physics-driven spellcasting and dynamic volumetric lighting.
+
+## Technology Stack & Engineering Standards
+- **Engines**: Unreal Engine 5.4, Unity (URP), WebGL / Three.js.
+- **Spatial Computing**: OpenXR, Meta Quest SDK, WebXR.
+- **Web Frontend**: React 18, Vite, TypeScript, Tailwind CSS, Structured Microdata (JSON-LD).
+- **Audio & NLP**: Edge-optimized sub-180ms vocal inference pipelines, spatial audio, contextual dialogue buffers.
+- **Location**: Karachi, Sindh, Pakistan with international publishing reach.
+
+## Executive Leadership
+- **Hassan Noor Soomro**: Founder, Lead System Designer, and VR Teacher at The 14 Lights. Pioneer in VR educational systems, Unreal Engine architecture, and bilingual AI curriculum integration.
+
+## Client Success & Global Track Record
+- **100+ Happy Clients**: Global gaming creators, VR teams, and EdTech institutions across 18+ countries.
+- **98.7% Satisfaction Rate**: Across 120+ interactive and XR deliverables.
+- **4.8 ★ Average Rating**: Verified milestone deliveries in Unreal Engine 5, Unity WebGL, Meta Quest VR, and AI integrations.
+- **Client Portfolio**: https://the14lights.com/#clients
