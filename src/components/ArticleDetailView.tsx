@@ -6,6 +6,10 @@ import { SEOHead } from './SEOHead';
 import { AuthorBio } from './AuthorBio';
 import vrLogo from '../assets/VR_LOGO.webp';
 import hassanProfileImg from '../assets/profile.png';
+import { GameDevelopmentPillarContent } from './GameDevelopmentPillarContent';
+import { HowToMakeAVideoGameContent } from './HowToMakeAVideoGameContent';
+import { BuyPCGamesOnlineSafelyContent } from './BuyPCGamesOnlineSafelyContent';
+import { PCVsConsoleGamingContent } from './PCVsConsoleGamingContent';
 
 interface ArticleDetailViewProps {
   articleId?: string;
@@ -31,6 +35,16 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
     BLOG_ARTICLES.find((a) => a.id === articleId || a.slug === articleId) ||
     BLOG_ARTICLES[0];
 
+  const canonicalPath = article.id === 'game-development-services'
+    ? '/game-development-services'
+    : article.id === 'how-to-make-a-video-game'
+    ? '/how-to-make-a-video-game'
+    : article.id === 'buy-pc-games-online-safely'
+    ? '/buy-pc-games-online-safely'
+    : article.id === 'pc-vs-console-gaming'
+    ? '/pc-vs-console-gaming'
+    : `/article/${article.slug}`;
+
   useEffect(() => {
     document.body.className = 'antialiased selection:bg-gold-500 selection:text-black w-full overflow-x-hidden blog-page';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -38,7 +52,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
     updatePageSeo({
       title: `${article.title} | The 14 Lights`,
       description: article.metaDescription,
-      canonicalPath: `/article/${article.slug}`,
+      canonicalPath: canonicalPath,
       ogImage: article.image,
       ogType: 'article',
     });
@@ -46,7 +60,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
     return () => {
       document.body.className = '';
     };
-  }, [article.id, article.slug, article.title, article.metaDescription, article.image]);
+  }, [article.id, article.slug, article.title, article.metaDescription, article.image, canonicalPath]);
 
   // Scroll handler for reading progress & scrollspy
   useEffect(() => {
@@ -83,7 +97,9 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
   }, [article.sections]);
 
   const handleCopyShare = () => {
-    const canonicalShareUrl = `https://the14lights.com/article/${article.slug}`;
+    const canonicalShareUrl = article.id === 'game-development-services'
+      ? 'https://the14lights.com/game-development-services'
+      : `https://the14lights.com/article/${article.slug}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(canonicalShareUrl).then(() => {
         setCopied(true);
@@ -121,12 +137,14 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
     "@type": "BlogPosting",
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://the14lights.com/article/${article.slug}`
+      "@id": article.id === 'game-development-services'
+        ? "https://the14lights.com/game-development-services"
+        : `https://the14lights.com/article/${article.slug}`
     },
     "headline": article.title,
     "image": [article.image],
-    "datePublished": "2026-11-18T08:00:00+05:00",
-    "dateModified": "2026-11-18T10:00:00+05:00",
+    "datePublished": article.id === 'game-development-services' ? "2026-10-29T08:00:00+05:00" : "2026-11-18T08:00:00+05:00",
+    "dateModified": article.id === 'game-development-services' ? "2026-10-29T10:00:00+05:00" : "2026-11-18T10:00:00+05:00",
     "author": {
       "@type": "Person",
       "name": article.author,
@@ -144,6 +162,20 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
     "keywords": article.primaryKeywords.concat(article.secondaryKeywords, article.tags).join(", ")
   };
 
+  // Build FAQPage Schema if FAQs exist
+  const faqSchema = article.faqs && article.faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": article.faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  } : null;
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B]">
       {/* Inject JSON-LD Schema for BlogPosting SEO */}
@@ -151,6 +183,13 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSchema) }}
       />
+      {/* Inject JSON-LD Schema for FAQPage SEO */}
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
 
       {/* Reading Progress Indicator */}
       <div id="scroll-progress" aria-hidden="true" style={{ width: `${scrollProgress}%` }}></div>
@@ -345,7 +384,8 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
           <div className="rounded-3xl overflow-hidden shadow-md border-2 border-slate-200/90 aspect-[21/9] bg-slate-100 relative">
             <img
               src={article.image}
-              alt={article.title}
+              alt={article.imageAlt || article.title}
+              title={article.imageAlt || article.title}
               className="w-full h-full object-cover"
             />
           </div>
@@ -373,7 +413,15 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
               )}
 
               {/* Dynamic Body Content according to Article ID */}
-              {article.id === 'ai-virtual-teacher-edtech-pakistan-guide' ? (
+              {article.id === 'game-development-services' ? (
+                <GameDevelopmentPillarContent onNavigate={onNavigate} />
+              ) : article.id === 'how-to-make-a-video-game' ? (
+                <HowToMakeAVideoGameContent onNavigate={onNavigate} />
+              ) : article.id === 'buy-pc-games-online-safely' ? (
+                <BuyPCGamesOnlineSafelyContent onNavigate={onNavigate} />
+              ) : article.id === 'pc-vs-console-gaming' ? (
+                <PCVsConsoleGamingContent onNavigate={onNavigate} />
+              ) : article.id === 'ai-virtual-teacher-edtech-pakistan-guide' ? (
                 <div id="article-content" className="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-6">
                   {/* Spotlight Section: What is EduraXR? */}
                   <div id="section-eduraxr" className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950 text-white p-6 sm:p-8 md:p-10 rounded-3xl shadow-xl border border-gold-500/30 my-6 not-prose relative overflow-hidden">
@@ -568,7 +616,7 @@ export const ArticleDetailView: React.FC<ArticleDetailViewProps> = ({ articleId,
                     The next evolution of our product suite connects our AI Teacher model directly with 3D spatial computing and Unreal Engine 5 virtual environments. Students wearing lightweight VR headsets will soon step inside historical historical recreations, interactive chemistry labs, and simulated space explorations guided by their AI Teacher avatar.
                   </p>
                   <p>
-                    Explore our research on <button onClick={() => onNavigate('article', 'generative-ai-unreal-engine-5-vr-game-development')} className="text-gold-600 font-bold hover:underline">Integrating Generative AI with Unreal Engine 5 & VR</button> or discover our <button onClick={() => onNavigate('blog')} className="text-gold-600 font-bold hover:underline">Full Technical Blog Series</button>.
+                    Explore our research on <button onClick={() => onNavigate('article', 'generative-ai-unreal-engine-5-vr-game-development')} className="text-gold-600 font-bold hover:underline">Integrating Generative AI with Unreal Engine 5 & VR</button>, view our custom <button onClick={() => onNavigate('article', 'game-development-services')} className="text-gold-600 font-bold hover:underline">Game Development Services</button>, or discover our <button onClick={() => onNavigate('blog')} className="text-gold-600 font-bold hover:underline">Full Technical Blog Series</button>.
                   </p>
                 </div>
               ) : article.id === 'generative-ai-unreal-engine-5-vr-game-development' ? (
@@ -659,7 +707,7 @@ void UAICharacterComponent::ConnectToAIServer() {
                     As spatial headsets evolve, combining generative AI with Unreal Engine 5 will redefine narrative entertainment, educational VR simulations, and enterprise training.
                   </p>
                   <p>
-                    Learn more about our flagship product, <button onClick={() => onNavigate('article', 'ai-virtual-teacher-edtech-pakistan-guide')} className="text-gold-600 font-bold hover:underline">Pakistan's First Virtual AI Teacher</button>, or view our <button onClick={() => onNavigate('blog')} className="text-gold-600 font-bold hover:underline">Game Development Services</button>.
+                    Learn more about our flagship product, <button onClick={() => onNavigate('article', 'ai-virtual-teacher-edtech-pakistan-guide')} className="text-gold-600 font-bold hover:underline">Pakistan's First Virtual AI Teacher</button>, or view our dedicated <button onClick={() => onNavigate('article', 'game-development-services')} className="text-gold-600 font-bold hover:underline">Game Development Services</button>.
                   </p>
                 </div>
               ) : (

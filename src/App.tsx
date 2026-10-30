@@ -52,6 +52,9 @@ export default function App() {
       } else if (hash.startsWith('#/privacy') || hash === '#privacy') {
         pathname = '/privacy';
         window.history.replaceState({}, '', '/privacy');
+      } else if (hash.startsWith('#/game-development-services') || hash === '#game-development-services') {
+        pathname = '/game-development-services';
+        window.history.replaceState({}, '', '/game-development-services');
       } else if (hash.startsWith('#/article/') || hash.startsWith('#article/')) {
         const parts = hash.split('/');
         if (parts[2]) {
@@ -89,6 +92,18 @@ export default function App() {
         setCurrentView('newsletter');
       } else if (pathname === '/privacy') {
         setCurrentView('privacy');
+      } else if (pathname === '/game-development-services') {
+        setSelectedArticleId('game-development-services');
+        setCurrentView('article');
+      } else if (pathname === '/how-to-make-a-video-game') {
+        setSelectedArticleId('how-to-make-a-video-game');
+        setCurrentView('article');
+      } else if (pathname === '/buy-pc-games-online-safely') {
+        setSelectedArticleId('buy-pc-games-online-safely');
+        setCurrentView('article');
+      } else if (pathname === '/pc-vs-console-gaming') {
+        setSelectedArticleId('pc-vs-console-gaming');
+        setCurrentView('article');
       } else if (pathname.startsWith('/article/')) {
         const parts = pathname.split('/');
         if (parts.length >= 3 && parts[2]) {
@@ -189,8 +204,18 @@ export default function App() {
     } else if (view === 'privacy') {
       targetPath = '/privacy';
     } else if (view === 'article') {
-      const targetId = articleOrGameId || selectedArticleId || 'ai-virtual-teacher-edtech-pakistan-guide';
-      targetPath = `/article/${targetId}`;
+      const targetId = articleOrGameId || selectedArticleId || 'game-development-services';
+      if (targetId === 'game-development-services') {
+        targetPath = '/game-development-services';
+      } else if (targetId === 'how-to-make-a-video-game') {
+        targetPath = '/how-to-make-a-video-game';
+      } else if (targetId === 'buy-pc-games-online-safely') {
+        targetPath = '/buy-pc-games-online-safely';
+      } else if (targetId === 'pc-vs-console-gaming') {
+        targetPath = '/pc-vs-console-gaming';
+      } else {
+        targetPath = `/article/${targetId}`;
+      }
     } else if (view === 'game') {
       const targetSlug = articleOrGameId || selectedGameSlug || 'crazy-fifa-2026';
       targetPath = `/game/${targetSlug}`;

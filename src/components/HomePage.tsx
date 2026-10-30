@@ -636,14 +636,23 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
 
             <div className="lg:col-span-7">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-amber-400/50 hover:-translate-y-2 transition-all duration-300">
-                  <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6">
-                    <i className="fa-solid fa-gamepad text-amber-400 text-2xl"></i>
+                <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-amber-400/50 hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between">
+                  <div>
+                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mb-6">
+                      <i className="fa-solid fa-gamepad text-amber-400 text-2xl"></i>
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-3">🎮 Game Development</h3>
+                    <p className="text-slate-400 leading-7 text-sm">
+                      Full-cycle PC, Mobile, Console, and VR game engineering using <a href="https://www.unrealengine.com/" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline hover:text-amber-300">Unreal Engine 5</a> &amp; <a href="https://unity.com/" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline hover:text-amber-300">Unity</a>.
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-3">🎮 Game Development</h3>
-                  <p className="text-slate-400 leading-7 text-sm">
-                    Full-cycle PC, Mobile, Console, and VR game engineering using <a href="https://www.unrealengine.com/" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline hover:text-amber-300">Unreal Engine 5</a> &amp; <a href="https://unity.com/" target="_blank" rel="noopener noreferrer" className="text-amber-400 underline hover:text-amber-300">Unity</a>.
-                  </p>
+                  <button
+                    onClick={() => onNavigate('article', 'game-development-services')}
+                    className="mt-4 inline-flex items-center gap-2 text-xs font-bold text-amber-400 hover:text-amber-300 uppercase tracking-wider group-hover:translate-x-1 transition duration-200 cursor-pointer self-start"
+                  >
+                    <span>Explore Services Guide</span>
+                    <i className="fa-solid fa-arrow-right text-[11px]"></i>
+                  </button>
                 </div>
 
                 <div className="group rounded-3xl p-7 bg-white/[0.04] backdrop-blur-md border border-white/10 hover:border-blue-400/50 hover:-translate-y-2 transition-all duration-300">

@@ -10,6 +10,10 @@ export interface BlogArticleData {
   categoryLabel: string;
   description: string;
   image: string;
+  imageAlt?: string;
+  focusKeyword?: string;
+  slugifiedKeyword?: string;
+  targetIntent?: string;
   author: string;
   authorRole: string;
   authorInitials: string;
@@ -28,6 +32,409 @@ export interface BlogArticleData {
 }
 
 export const BLOG_ARTICLES: BlogArticleData[] = [
+  {
+    id: 'game-development-services',
+    slug: 'game-development-services',
+    title: "Game Development Services: Custom Games for Mobile, PC, Console & VR",
+    metaTitle: "Game Development Services: Custom Games for Mobile, PC, Console & VR | The 14 Lights",
+    metaDescription: "Comprehensive game development services by The 14 Lights. Custom PC, mobile (Android/iOS), console, and Meta Quest VR game engineering, multiplayer netcode, and Unreal/Unity production.",
+    category: 'services',
+    categoryLabel: 'Game Dev Services',
+    description: "From concept prototyping to full-cycle production and cross-platform publishing, discover how The 14 Lights engineers custom games across Mobile, PC, Consoles, and VR.",
+    image: '/assets/game-development-services-custom-games-for-mobile-pc-console-vr.jpg',
+    imageAlt: "Game Development — Game Development Services: Custom Games for Mobile, PC, Console & VR",
+    focusKeyword: "Game Development",
+    slugifiedKeyword: "game-development",
+    targetIntent: "commercial / informational",
+    author: 'Hassan Noor Soomro',
+    authorRole: 'Founder & Lead Game Architect',
+    authorInitials: 'HN',
+    authorAvatar: hassanProfileImg,
+    date: 'Oct 29, 2026',
+    readTime: '14 min read',
+    views: '4.8k Views',
+    primaryKeywords: [
+      "Game Development Services",
+      "Custom Game Development",
+      "Mobile Game Development Android iOS",
+      "PC Console Game Development",
+      "VR Game Development Studio"
+    ],
+    secondaryKeywords: [
+      "Unreal Engine Game Development",
+      "Unity Game Development Pakistan",
+      "Cross-Platform Game Development",
+      "Multiplayer Game Development Netcode",
+      "2D and 3D Game Development"
+    ],
+    lsiKeywords: [
+      "Game prototyping and MVP",
+      "Unreal Engine 5 C++ plugins",
+      "Unity WebGL games",
+      "Spatial VR computing Meta Quest",
+      "Game design document technical planning",
+      "Game development outsourcing cost"
+    ],
+    tags: [
+      "Game Development",
+      "Custom Games",
+      "Mobile Games",
+      "PC & Console",
+      "Virtual Reality",
+      "Unreal Engine",
+      "Unity",
+      "Multiplayer",
+      "Services",
+      "The 14 Lights"
+    ],
+    breadcrumbs: [
+      { name: 'Home', url: '/' },
+      { name: 'Blog', url: '/blog' },
+      { name: "Game Development Services", url: '/game-development-services' }
+    ],
+    sections: [
+      { id: 'section-quick-answer', title: '1. Quick Answer: What Is Game Development?' },
+      { id: 'section-services-scope', title: '2. What Are Game Development Services?' },
+      { id: 'section-14-lights-portfolio', title: '3. The 14 Lights: Interactive Experiences & Flagship Titles' },
+      { id: 'section-custom-dev', title: '4. Custom Game Development for Your Idea' },
+      { id: 'section-mobile-dev', title: '5. Mobile Game Development for Android & iOS' },
+      { id: 'section-pc-console', title: '6. PC and Console Game Development' },
+      { id: 'section-2d-3d', title: '7. 2D vs 3D Game Development' },
+      { id: 'section-engines', title: '8. Unity vs Unreal Engine vs Godot' },
+      { id: 'section-multiplayer', title: '9. Multiplayer Game Development & Netcode' },
+      { id: 'section-vr-xr', title: '10. VR, AR, and XR Game Development' },
+      { id: 'section-ai-game-dev', title: '11. AI in Game Development' },
+      { id: 'section-process', title: '12. Game Development Process: From Idea to Launch' },
+      { id: 'section-costs', title: '13. How Much Does Game Development Cost?' },
+      { id: 'section-choose-studio', title: '14. How to Choose the Right Game Studio' },
+      { id: 'section-faq', title: '15. Frequently Asked Questions (FAQ)' }
+    ],
+    faqs: [
+      {
+        question: "What is game development?",
+        answer: "Game development is the process of designing, programming, testing, and releasing interactive games. It includes gameplay mechanics, graphics, audio, interfaces, optimization, and other systems required to deliver a playable experience."
+      },
+      {
+        question: "What does a game development company do?",
+        answer: "A game development company helps turn a game concept into a working product. Depending on its services, it may handle design, programming, art, animation, multiplayer systems, testing, platform deployment, and ongoing updates."
+      },
+      {
+        question: "What are game development services?",
+        answer: "Game development services may include custom game design, mobile and PC development, 2D and 3D production, console adaptation, multiplayer engineering, VR/AR experiences, testing, and maintenance. The exact services vary by studio."
+      },
+      {
+        question: "How much does custom game development cost?",
+        answer: "The cost depends on the game's features, art style, platforms, development time, online infrastructure, and testing requirements. A prototype usually requires less work than a polished, content-rich game. Request a quotation based on a defined scope."
+      },
+      {
+        question: "How long does it take to develop a game?",
+        answer: "A simple prototype may take weeks, while a polished game can require months or years. Multiplayer functionality, extensive content, complex art, platform certification, and repeated testing can extend the timeline."
+      },
+      {
+        question: "Which game engine is best for development?",
+        answer: "Unity, Unreal Engine, and Godot are all useful options. Unity is often considered for mobile and cross-platform projects, Unreal Engine for demanding 3D experiences, and Godot for a range of 2D and 3D projects. The best choice depends on requirements and team expertise."
+      },
+      {
+        question: "Can one game run on Android, iOS, and PC?",
+        answer: "Yes. A cross-platform game can share much of its code and content across Android, iOS, and PC. However, controls, performance, interfaces, platform services, and release requirements still need platform-specific work."
+      },
+      {
+        question: "What is the difference between 2D and 3D game development?",
+        answer: "2D games primarily use two-dimensional visual elements, while 3D games use three-dimensional models, environments, cameras, and lighting. Neither approach is inherently better; the right choice depends on the desired gameplay and visual style."
+      },
+      {
+        question: "What is multiplayer game development?",
+        answer: "Multiplayer game development creates systems that let multiple players participate in the same game. It may involve networking, matchmaking, session management, server infrastructure, synchronization, and security."
+      },
+      {
+        question: "What is VR game development?",
+        answer: "VR game development creates interactive experiences for virtual reality headsets. It requires attention to tracking, spatial interaction, responsive performance, and user comfort."
+      },
+      {
+        question: "Can AI be used in game development?",
+        answer: "Yes. AI can power non-player characters, adaptive opponents, procedural systems, and selected development workflows. AI-generated content and code still need testing, review, and appropriate rights checks."
+      },
+      {
+        question: "How do I hire game developers?",
+        answer: "Define your concept, platform, feature list, budget, and timeline first. Then review relevant portfolios, discuss technical approaches, agree on milestones, and document ownership and delivery requirements."
+      },
+      {
+        question: "Is game development outsourcing a good idea?",
+        answer: "Outsourcing can provide access to specialized skills and flexible project capacity. It works best when responsibilities, communication, documentation, milestones, intellectual property, and quality standards are agreed upon."
+      },
+      {
+        question: "Does The 14 Lights develop games for multiple platforms?",
+        answer: "The company's website describes game engineering for PC, mobile, console, and VR, and lists deployment targets including Windows, Android, iOS, PlayStation, Xbox, and Meta Quest. Confirm the exact supported platforms for your project directly with the team."
+      },
+      {
+        question: "How can I contact The 14 Lights about a game project?",
+        answer: "Visit https://the14lights.com/ to explore the company's work and contact options. The website lists hello@the14lights.com as its contact email."
+      }
+    ],
+    relatedArticleIds: [
+      'how-to-make-a-video-game',
+      'pc-vs-console-gaming',
+      'buy-pc-games-online-safely',
+      'generative-ai-unreal-engine-5-vr-game-development'
+    ]
+  },
+  {
+    id: 'how-to-make-a-video-game',
+    slug: 'how-to-make-a-video-game',
+    title: "How to Make a Video Game as a Beginner (Step-by-Step)",
+    metaTitle: "How to Make a Video Game as a Beginner (Step-by-Step) | The 14 Lights",
+    metaDescription: "Learn how to make a video game from scratch: pick a free engine, build a small 2D project and actually finish it. A simple beginner roadmap.",
+    category: 'engineering',
+    categoryLabel: 'Beginner Guide',
+    description: "Every gamer has had the thought: 'I could make something better than this.' Start today for free without a degree or a team with this step-by-step game development roadmap.",
+    image: '/assets/how-to-make-a-video-game-beginner-guide.jpg',
+    imageAlt: "beginner learning how to make a video game in a game engine",
+    focusKeyword: "how to make a video game",
+    slugifiedKeyword: "how-to-make-a-video-game",
+    targetIntent: "how to make a video game (informational)",
+    author: 'Hassan Noor Soomro',
+    authorRole: 'Founder & Lead Game Architect',
+    authorInitials: 'HN',
+    authorAvatar: hassanProfileImg,
+    date: 'Oct 30, 2026',
+    readTime: '8 min read',
+    views: '2.4k Views',
+    primaryKeywords: [
+      "how to make a video game",
+      "game development for beginners",
+      "how to build a video game step by step"
+    ],
+    secondaryKeywords: [
+      "free game engine beginner",
+      "Godot beginner tutorial",
+      "make 2D game from scratch"
+    ],
+    lsiKeywords: [
+      "Godot 2D game development",
+      "Unity learn C#",
+      "indie game prototyping",
+      "publishing games on itch.io"
+    ],
+    tags: [
+      "Game Development",
+      "Godot Engine",
+      "Unity",
+      "Indie Games",
+      "Beginner Guide",
+      "The 14 Lights"
+    ],
+    breadcrumbs: [
+      { name: 'Home', url: '/' },
+      { name: 'Blog', url: '/blog' },
+      { name: "How to Make a Video Game", url: '/how-to-make-a-video-game' }
+    ],
+    sections: [
+      { id: 'section-quick-answer', title: 'Quick Answer: How Do You Make a Game as a Beginner?' },
+      { id: 'section-step-1', title: 'Step 1: Start with a Tiny Idea' },
+      { id: 'section-step-2', title: 'Step 2: Choose a Game Engine (Godot vs Unity)' },
+      { id: 'section-step-3', title: 'Step 3: Follow One Complete Tutorial' },
+      { id: 'section-step-4', title: 'Step 4: Add Art and Sound' },
+      { id: 'section-step-5', title: 'Step 5: Playtest Early and Often' },
+      { id: 'section-step-6', title: 'Step 6: Publish It' },
+      { id: 'section-mistakes', title: 'Common Beginner Mistakes to Avoid' },
+      { id: 'section-final', title: 'Final Thoughts & Studio Comparison' },
+      { id: 'section-faq', title: 'Frequently Asked Questions' }
+    ],
+    faqs: [
+      {
+        question: "How do you make a video game as a beginner?",
+        answer: "To make a video game as a beginner, pick one free game engine such as Godot or Unity, build a tiny 2D project like a dodge or platformer game, learn basic scripting as you go, and finish it before starting anything bigger. Small and finished beats big and abandoned every time."
+      },
+      {
+        question: "Do I need coding experience to start making video games?",
+        answer: "No prior degree or advanced programming background is required. Engines like Godot use beginner-friendly languages like GDScript (similar to Python), while Unity provides visual scripting tools and structured C# learning paths."
+      },
+      {
+        question: "How long does it take to build your first video game?",
+        answer: "A tiny 2D prototype (like dodging falling objects or a 3-level platformer) can be built in a few weekends when scoping strictly and following a single tutorial from start to finish."
+      },
+      {
+        question: "Where can beginners publish their games for free?",
+        answer: "Platforms like itch.io allow anyone to upload WebGL or downloadable indie builds for free, receive player feedback, and iterate before committing to commercial Steam store fees."
+      }
+    ],
+    relatedArticleIds: [
+      'game-development-services',
+      'pc-vs-console-gaming',
+      'buy-pc-games-online-safely'
+    ]
+  },
+  {
+    id: 'buy-pc-games-online-safely',
+    slug: 'buy-pc-games-online-safely',
+    title: "How to Buy PC Games Online Safely: 7 Simple Rules",
+    metaTitle: "How to Buy PC Games Online Safely: 7 Simple Rules | The 14 Lights",
+    metaDescription: "Want to buy PC games online without getting scammed? Learn how to spot fake key sellers, check ratings, use refunds and protect your account.",
+    category: 'services',
+    categoryLabel: 'PC Gaming Guide',
+    description: "Buying games online is easy. Buying them safely takes a little more thought. Protect your wallet and library with these 7 fundamental digital purchasing rules.",
+    image: '/assets/buy-pc-games-online-safely-guide.jpg',
+    imageAlt: "gamer checking a digital game store before buying PC games online safely",
+    focusKeyword: "buy PC games online safely",
+    slugifiedKeyword: "buy-pc-games-online-safely",
+    targetIntent: "buy PC games online safely (informational / commercial)",
+    author: 'Ahmed Shahab',
+    authorRole: 'Security & Systems Analyst',
+    authorInitials: 'AS',
+    authorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400',
+    date: 'Oct 30, 2026',
+    readTime: '7 min read',
+    views: '2.1k Views',
+    primaryKeywords: [
+      "buy PC games online safely",
+      "safe PC game stores",
+      "avoid fake game key scams"
+    ],
+    secondaryKeywords: [
+      "Steam refund policy rules",
+      "ESRB video game age ratings",
+      "Steam Guard two factor authentication"
+    ],
+    lsiKeywords: [
+      "Epic Games Store safety",
+      "GOG DRM-free games",
+      "gray market CD key risks",
+      "in-game microtransaction spending limits"
+    ],
+    tags: [
+      "PC Gaming",
+      "Steam",
+      "Digital Security",
+      "Game Buying Guide",
+      "Safe Shopping",
+      "The 14 Lights"
+    ],
+    breadcrumbs: [
+      { name: 'Home', url: '/' },
+      { name: 'Blog', url: '/blog' },
+      { name: "Buy PC Games Online Safely", url: '/buy-pc-games-online-safely' }
+    ],
+    sections: [
+      { id: 'section-quick-answer', title: 'Quick Answer: How Can You Buy PC Games Safely?' },
+      { id: 'section-rule-1', title: 'Rule 1: Stick to Trusted Stores' },
+      { id: 'section-rule-2', title: 'Rule 2: Treat Suspicious Prices with Caution' },
+      { id: 'section-rule-3', title: 'Rule 3: Check the Age Rating (ESRB Guide)' },
+      { id: 'section-rule-4', title: 'Rule 4: Know the Refund Rules Before Buying' },
+      { id: 'section-rule-5', title: 'Rule 5: Read Reviews and System Requirements' },
+      { id: 'section-rule-6', title: 'Rule 6: Lock Down Your Account (2FA & Steam Guard)' },
+      { id: 'section-rule-7', title: 'Rule 7: Watch Out for In-Game Purchases' },
+      { id: 'section-checklist', title: 'Quick Safety Checklist' },
+      { id: 'section-final', title: 'Final Thoughts & Store Picks' },
+      { id: 'section-faq', title: 'Frequently Asked Questions' }
+    ],
+    faqs: [
+      {
+        question: "How can you buy PC games online safely?",
+        answer: "To buy PC games online safely, use well-known stores like Steam, Epic Games Store or GOG, avoid suspiciously cheap key sellers, check the game's age rating and reviews before paying, learn the store's refund rules, and protect your account with two-factor authentication."
+      },
+      {
+        question: "What is Steam's refund policy?",
+        answer: "Steam allows refunds on almost any purchase within 14 days of purchase, provided the title has been played for less than 2 hours across all sessions."
+      },
+      {
+        question: "Why are third-party CD key reseller prices often so cheap?",
+        answer: "Ultra-cheap keys on unauthorized marketplaces often originate from stolen credit cards, bulk region exploits, or promotional giveaways. Publishers frequently revoke these keys, locking you out of the game without buyer protection."
+      },
+      {
+        question: "What are the ESRB age rating categories?",
+        answer: "The ESRB assigns ratings across five main categories: E (Everyone), E10+ (Everyone 10 and older), T (Teen 13+), M (Mature 17+), and AO (Adults Only 18+), alongside detailed content descriptors."
+      }
+    ],
+    relatedArticleIds: [
+      'pc-vs-console-gaming',
+      'game-development-services',
+      'how-to-make-a-video-game'
+    ]
+  },
+  {
+    id: 'pc-vs-console-gaming',
+    slug: 'pc-vs-console-gaming',
+    title: "PC vs Console Gaming: Which Is Right for You in 2026?",
+    metaTitle: "PC vs Console Gaming: Which Is Right for You in 2026? | The 14 Lights",
+    metaDescription: "PC or console? Compare cost, upgrades, game libraries, mods and ease of use to find the gaming platform that actually fits your budget and style.",
+    category: 'engineering',
+    categoryLabel: 'Hardware & Tech',
+    description: "It's the oldest debate in gaming, and neither side is universally superior. Compare cost, upgrades, game libraries, mods, and ease of use to pick your ideal setup.",
+    image: '/assets/pc-vs-console-gaming-comparison-2026.jpg',
+    imageAlt: "gaming PC and console side by side for a PC vs console gaming comparison",
+    focusKeyword: "PC vs console gaming",
+    slugifiedKeyword: "pc-vs-console-gaming",
+    targetIntent: "PC vs console gaming (commercial / comparison)",
+    author: 'Hassan Noor Soomro',
+    authorRole: 'Founder & Lead Game Architect',
+    authorInitials: 'HN',
+    authorAvatar: hassanProfileImg,
+    date: 'Oct 30, 2026',
+    readTime: '9 min read',
+    views: '3.1k Views',
+    primaryKeywords: [
+      "PC vs console gaming",
+      "PC or console in 2026",
+      "compare gaming PC and console"
+    ],
+    secondaryKeywords: [
+      "console plug and play gaming",
+      "PC gaming mods and upgrades",
+      "PlayStation Xbox vs PC comparison"
+    ],
+    lsiKeywords: [
+      "Steam Hardware Survey 2026",
+      "couch gaming vs desk gaming",
+      "GPU upgrade cost vs console price",
+      "cross-play multiplayer games"
+    ],
+    tags: [
+      "PC Gaming",
+      "Consoles",
+      "PlayStation",
+      "Xbox",
+      "Hardware",
+      "The 14 Lights"
+    ],
+    breadcrumbs: [
+      { name: 'Home', url: '/' },
+      { name: 'Blog', url: '/blog' },
+      { name: "PC vs Console Gaming 2026", url: '/pc-vs-console-gaming' }
+    ],
+    sections: [
+      { id: 'section-quick-answer', title: 'Quick Answer: PC or Console?' },
+      { id: 'section-comparison-table', title: 'PC vs Console at a Glance' },
+      { id: 'section-console-case', title: 'The Case for Console Gaming' },
+      { id: 'section-pc-case', title: 'The Case for PC Gaming' },
+      { id: 'section-how-to-decide', title: 'How to Decide in 4 Steps' },
+      { id: 'section-both', title: 'What About Playing on Both?' },
+      { id: 'section-final', title: 'Final Thoughts & Recommendations' },
+      { id: 'section-faq', title: 'Frequently Asked Questions' }
+    ],
+    faqs: [
+      {
+        question: "PC or console: which should you choose?",
+        answer: "Choose a console if you want a simple, plug-and-play setup with a fixed cost and easy couch gaming. Choose a PC if you want more flexibility, upgrades, mods and a bigger range of stores and game types. Your budget and favorite games should decide the final call."
+      },
+      {
+        question: "Is PC gaming more expensive than console gaming?",
+        answer: "A gaming PC generally requires a higher initial investment for the tower and peripherals, but saves money over time through free online multiplayer, widespread digital game sales, and modular parts upgrading."
+      },
+      {
+        question: "Can I play console games on PC or vice versa?",
+        answer: "Many modern AAA titles offer cross-play and cross-progression between PC and consoles. Additionally, Sony and Xbox publish first-party titles on PC platforms like Steam and Windows Store."
+      },
+      {
+        question: "What peripherals do I need for both platforms?",
+        answer: "Consoles include a wireless controller out of the box, whereas PCs natively support mechanical keyboards, precision mice, flight sticks, and Xbox/PlayStation controllers interchangeably."
+      }
+    ],
+    relatedArticleIds: [
+      'buy-pc-games-online-safely',
+      'how-to-make-a-video-game',
+      'game-development-services'
+    ]
+  },
   {
     id: 'ai-virtual-teacher-edtech-pakistan-guide',
     slug: 'ai-virtual-teacher-edtech-pakistan-guide',

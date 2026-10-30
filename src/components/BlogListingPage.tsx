@@ -243,7 +243,7 @@ export const BlogListingPage: React.FC<BlogListingPageProps> = ({ onNavigate }) 
 
                 <div className="bg-amber-50/80 border-l-4 border-gold-500 border border-amber-200/70 p-5 mb-6 rounded-r-xl shadow-xs">
                   <p className="text-slate-800 text-sm font-medium leading-relaxed">
-                    <strong className="text-slate-950">What is the Virtual AI Teacher?</strong> Developed by The 14Lights, it is Pakistan's first generative AI-powered educational platform. It provides real-time, personalized tutoring, adapts to individual learning paces, and bridges the accessibility gap in modern EdTech infrastructure.
+                    <strong className="text-slate-950">What is the Virtual AI Teacher?</strong> Developed by The 14 Lights, it is Pakistan's first generative AI-powered educational platform. It provides real-time, personalized tutoring, adapts to individual learning paces, and bridges the accessibility gap in modern EdTech infrastructure.
                   </p>
                 </div>
 
@@ -254,7 +254,7 @@ export const BlogListingPage: React.FC<BlogListingPageProps> = ({ onNavigate }) 
                 <div className="flex items-center gap-4 mb-8 pt-4 border-t border-slate-200">
                   <div className="w-12 h-12 rounded-full border-2 border-gold-500/40 flex items-center justify-center bg-gold-500/10 text-gold-700 font-extrabold">14L</div>
                   <div>
-                    <span className="block text-sm font-bold text-slate-950">The 14Lights Team</span>
+                    <span className="block text-sm font-bold text-slate-950">The 14 Lights Team</span>
                     <span className="block text-xs text-slate-600 font-medium">Product Engineering • 6 min read</span>
                   </div>
                 </div>
@@ -351,23 +351,58 @@ export const BlogListingPage: React.FC<BlogListingPageProps> = ({ onNavigate }) 
                     key={article.id}
                     className="article-card bg-white rounded-2xl overflow-hidden border-2 border-slate-200/90 hover:border-gold-500/60 shadow-[0_4px_16px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_rgba(15,23,42,0.12)] transition-all duration-300 flex flex-col group"
                   >
-                    <a
-                      href={`/article/${article.id}`}
-                      onClick={(e) => { e.preventDefault(); onNavigate('article', article.id); }}
-                      className="relative aspect-video overflow-hidden bg-slate-100 block"
-                      aria-label={`Read article: ${article.title}`}
-                    >
-                      <img src={article.image} alt={article.title} className="w-full h-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />
-                      <div className="absolute top-3 left-3">
-                        <span className="px-2.5 py-1 bg-white/95 backdrop-blur text-slate-950 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200 shadow-xs">
-                          {article.categoryLabel}
-                        </span>
-                      </div>
-                    </a>
+                    {(() => {
+                      const articleHref =
+                        article.id === 'game-development-services'
+                          ? '/game-development-services'
+                          : article.id === 'how-to-make-a-video-game'
+                          ? '/how-to-make-a-video-game'
+                          : article.id === 'buy-pc-games-online-safely'
+                          ? '/buy-pc-games-online-safely'
+                          : article.id === 'pc-vs-console-gaming'
+                          ? '/pc-vs-console-gaming'
+                          : `/article/${article.id}`;
+                      return (
+                        <a
+                          href={articleHref}
+                          onClick={(e) => { e.preventDefault(); onNavigate('article', article.id); }}
+                          className="relative aspect-video overflow-hidden bg-slate-100 block"
+                          aria-label={`Read article: ${article.title}`}
+                        >
+                          <img
+                            src={article.image}
+                            alt={article.imageAlt || article.title}
+                            title={article.imageAlt || article.title}
+                            className="w-full h-full object-cover transition duration-500 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
+                            <span className="px-2.5 py-1 bg-white/95 backdrop-blur text-slate-950 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200 shadow-xs">
+                              {article.categoryLabel}
+                            </span>
+                            {article.slugifiedKeyword && (
+                              <span className="px-2 py-0.5 bg-slate-900/90 backdrop-blur text-gold-400 text-[10px] font-mono font-bold uppercase tracking-wider rounded-md border border-gold-500/30 shadow-xs">
+                                #{article.slugifiedKeyword}
+                              </span>
+                            )}
+                          </div>
+                        </a>
+                      );
+                    })()}
                     <div className="p-5 flex flex-col flex-grow">
                       <h3 className="text-lg font-bold text-slate-950 mb-2 leading-snug">
                         <a
-                          href={`/article/${article.id}`}
+                          href={
+                            article.id === 'game-development-services'
+                              ? '/game-development-services'
+                              : article.id === 'how-to-make-a-video-game'
+                              ? '/how-to-make-a-video-game'
+                              : article.id === 'buy-pc-games-online-safely'
+                              ? '/buy-pc-games-online-safely'
+                              : article.id === 'pc-vs-console-gaming'
+                              ? '/pc-vs-console-gaming'
+                              : `/article/${article.id}`
+                          }
                           onClick={(e) => { e.preventDefault(); onNavigate('article', article.id); }}
                           className="hover:text-gold-600 transition focus:outline-none focus:underline"
                         >
@@ -437,7 +472,7 @@ export const BlogListingPage: React.FC<BlogListingPageProps> = ({ onNavigate }) 
           <div className="max-w-4xl mx-auto px-4 md:px-6 relative z-10">
             <div className="bg-slate-50/90 border-2 border-slate-200/90 rounded-3xl p-8 md:p-12 text-center shadow-sm">
               <span className="text-xs text-gold-700 uppercase tracking-widest font-bold block mb-2">Technical Journal Updates</span>
-              <h2 id="newsletter-title" className="text-2xl md:text-3xl font-display font-bold text-slate-950 mb-3">Subscribe to The 14Lights Dispatch</h2>
+              <h2 id="newsletter-title" className="text-2xl md:text-3xl font-display font-bold text-slate-950 mb-3">Subscribe to The 14 Lights Dispatch</h2>
               <p className="text-slate-600 text-sm max-w-md mx-auto mb-8 leading-relaxed">Receive technical breakdowns, engineering diaries, and early playtest openings directly in your inbox.</p>
 
               <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto relative flex flex-col sm:flex-row gap-2">
@@ -494,7 +529,7 @@ export const BlogListingPage: React.FC<BlogListingPageProps> = ({ onNavigate }) 
                     <source srcSet="/assets/VR_LOGO.webp" type="image/webp" />
                     <img
                       src={vrLogo}
-                      alt="The 14Lights Logo"
+                      alt="The 14 Lights Logo"
                       width={40}
                       height={40}
                       loading="lazy"
